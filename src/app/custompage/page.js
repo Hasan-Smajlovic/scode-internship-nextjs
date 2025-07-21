@@ -1,9 +1,9 @@
-export default function SomeCustomPage() {
+export default function SomeCustomPage () {
   return (
     <div>
-      <a href="/">
+      <a href='/'>
         Go back to Home Page
       </a>
     </div>
-  );
+  )
 }

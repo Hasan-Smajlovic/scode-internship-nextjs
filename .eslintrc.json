@@ -1,0 +1,50 @@
+{
+  "extends": [
+    "standard",
+    "standard-jsx",
+    "standard-react"
+  ],
+  "parserOptions": {
+    "requireConfigFile": false,
+    "ecmaVersion": 2022
+  },
+  "env": {
+    "browser": true,
+    "amd": true,
+    "es6": true,
+    "node": true
+  },
+  "rules": {
+    "eqeqeq": "warn",
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "curly": "error",
+    "key-spacing": [
+      "error",
+      {
+        "multiLine": {
+          "beforeColon": false,
+          "afterColon": true
+        },
+        "align": {
+          "beforeColon": true,
+          "afterColon": true,
+          "on": "colon"
+        }
+      }
+    ],
+    "react/jsx-handler-names": "off",
+    "react/jsx-indent": [
+      "error",
+      2
+    ],
+    "react/jsx-indent-props": [
+      "error",
+      2
+    ],
+    // // Since React 17 React is not required in the scope
+    "react/react-in-jsx-scope": "off"
+  }
+}
