@@ -7,6 +7,7 @@ import Link from '../../components/patterns/atoms/Link'
 import Image from '../../components/patterns/atoms/Image'
 import InputGroup from '../../components/patterns/molecules/InputGroup'
 import Alert from '../../components/patterns/atoms/Alert'
+import ApiTesting from '../../components/patterns/molecules/ApiTesting'
 
 import { FaUser, FaCalendar } from 'react-icons/fa'
 import { MdEmail } from 'react-icons/md'
@@ -115,6 +116,7 @@ export default function CustomPage () {
           <Button variant='secondary' onClick={handleAlertClick}>Show Alert</Button>
         </div>
       </div>
+      <ApiTesting />
     </div>
   )
 }

@@ -8,7 +8,6 @@ export default function Link ({ href, children, ...props }) {
 
   return (
     <div className='flex flex-col'>
-      {}
       <NextLink
         href={href}
         {...props}

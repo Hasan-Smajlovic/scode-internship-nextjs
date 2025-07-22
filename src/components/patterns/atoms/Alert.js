@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import Icon from './Icon'
+import { MdClose } from 'react-icons/md'
 
 export default function Alert ({ type = 'info', children, timeout = 5000, position = 'bottom-center', onClose }) {
   const [isVisible, setIsVisible] = useState(true)
@@ -63,7 +64,7 @@ export default function Alert ({ type = 'info', children, timeout = 5000, positi
         onClick={handleClose}
         aria-label='Close'
       >
-        <Icon name='close' className='h-4 w-4' />
+        <Icon icon={<MdClose />} className='h-4 w-4' />
       </button>
     </div>
   )
