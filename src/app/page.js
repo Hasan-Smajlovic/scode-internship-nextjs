@@ -1,9 +1,11 @@
+import Link from 'next/link'
+
 export default function Home () {
   return (
     <div>
-      <a href='/custompage'>
+      <Link href='/custompage'>
         Go to Custom Page
-      </a>
+      </Link>
     </div>
   )
 }

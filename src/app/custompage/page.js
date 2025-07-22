@@ -1,9 +1,9 @@
-export default function SomeCustomPage () {
+import TemplatePage from '../../components/templates/TemplatePage'
+
+export default function CustomPageWrapper () {
   return (
-    <div>
-      <a href='/'>
-        Go back to Home Page
-      </a>
-    </div>
+    <main>
+      <TemplatePage />
+    </main>
   )
 }
