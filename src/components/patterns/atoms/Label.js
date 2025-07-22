@@ -7,12 +7,12 @@ export default function Label ({ children, htmlFor, error, inputName }) {
         {children}
       </label>
       {inputName && (
-        <p className='text-sm text-gray-500 mt-1'>
+        <p className='text-sm text-primary mt-1'>
           {inputName}
         </p>
       )}
       {error && (
-        <p className='text-sm text-red-500 mt-1'>
+        <p className='text-sm text-danger mt-1'>
           {error}
         </p>
       )}
