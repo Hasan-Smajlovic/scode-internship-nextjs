@@ -1,40 +1,39 @@
-import mongodb from './mongodb'
 import { ObjectId } from 'mongodb'
+
+import MongoDB from './MongoDB'
 
 class DBObject {
   constructor (collectionName) {
     this.collectionName = collectionName
   }
 
-  async getCollection () {
-    const db = await mongodb.getDb()
-    return db.collection(this.collectionName)
+  async init () {
+    const mongoDbConnection = new MongoDB()
+    const connection = await mongoDbConnection.connect()
+    this.collection = connection.collection(this.collectionName)
   }
 
   async getOne (query = {}) {
-    const collection = await this.getCollection()
-
+    // Query can be a string (ObjectId)
     if (typeof query === 'string') {
-      return await collection.findOne({ _id: new ObjectId(query) })
+      return await this.collection.findOne({ _id: new ObjectId(query) })
     }
 
-    return await collection.findOne(query)
+    // Query can be an object
+    return await this.collection.findOne(query)
   }
 
   async getMany (query = {}) {
-    const collection = await this.getCollection()
-    return await collection.find(query).toArray()
+    return await this.collection.find(query).toArray()
   }
 
   async insertOne (document) {
-    const collection = await this.getCollection()
-
     const docToInsert = {
       ...document,
       createdAt: new Date()
     }
 
-    const result = await collection.insertOne(docToInsert)
+    const result = await this.collection.insertOne(docToInsert)
 
     return {
       insertedId : result.insertedId,
@@ -43,14 +42,12 @@ class DBObject {
   }
 
   async insertMany (documents) {
-    const collection = await this.getCollection()
-
     const docsToInsert = documents.map(doc => ({
       ...doc,
       createdAt: new Date()
     }))
 
-    const result = await collection.insertMany(docsToInsert)
+    const result = await this.collection.insertMany(docsToInsert)
 
     return {
       insertedCount : result.insertedCount,

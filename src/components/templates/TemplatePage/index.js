@@ -1,18 +1,18 @@
 'use client'
-
 import { useState } from 'react'
-import InputLabel from '../../components/patterns/molecules/InputLabel'
-import Button from '../../components/patterns/atoms/Button'
-import Link from '../../components/patterns/atoms/Link'
-import Image from '../../components/patterns/atoms/Image'
-import InputGroup from '../../components/patterns/molecules/InputGroup'
-import Alert from '../../components/patterns/atoms/Alert'
-import ApiTesting from '../../components/patterns/molecules/ApiTesting'
-
-import { FaUser, FaCalendar } from 'react-icons/fa'
 import { MdEmail } from 'react-icons/md'
+import { FaUser, FaCalendar } from 'react-icons/fa'
 
-export default function CustomPage () {
+import InputLabel from '../../../components/patterns/molecules/InputLabel'
+import Button from '../../../components/patterns/atoms/Button'
+import Link from '../../../components/patterns/atoms/Link'
+import Image from '../../../components/patterns/atoms/Image'
+import InputGroup from '../../../components/patterns/molecules/InputGroup'
+import Alert from '../../../components/patterns/atoms/Alert'
+import ApiTesting from './ApiTesting'
+import UploadFileForm from './UploadFileForm'
+
+export default function TemplatePage () {
   const [count, setCount] = useState(0)
 
   const handlePrimaryClick = () => {
@@ -117,6 +117,7 @@ export default function CustomPage () {
         </div>
       </div>
       <ApiTesting />
+      <UploadFileForm />
     </div>
   )
 }

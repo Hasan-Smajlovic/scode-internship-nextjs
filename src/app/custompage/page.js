@@ -1,4 +1,4 @@
-import TemplatePage from '../../components/templates/TemplatePage'
+import TemplatePage from '@/components/templates/TemplatePage'
 
 export default function CustomPageWrapper () {
   return (

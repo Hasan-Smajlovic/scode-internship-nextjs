@@ -1,6 +1,6 @@
-import Button from '../atoms/Button'
-import Alert from '../atoms/Alert'
-import InputLabel from '../molecules/InputLabel'
+import Button from '../../patterns/atoms/Button'
+import Alert from '../../patterns/atoms/Alert'
+import InputLabel from '../../patterns/molecules/InputLabel'
 import { useState } from 'react'
 import { FaUser, FaEnvelope } from 'react-icons/fa'
 
@@ -10,7 +10,6 @@ export default function ApiTesting () {
   const [response, setResponse] = useState(null)
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  // // const [debugInfo, setDebugInfo] = useState('')
 
   const validateForm = () => {
     const newErrors = {}

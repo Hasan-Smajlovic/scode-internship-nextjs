@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import Input from '../atoms/Input'
 import Label from '../atoms/Label'
@@ -18,12 +18,6 @@ export default function InputLabel ({
 }) {
   const [inputValue, setInputValue] = useState(inputProps.value || '')
   const [showError, setShowError] = useState(false)
-
-  useEffect(() => {
-    if (inputProps.value) {
-      setInputValue(inputProps.value)
-    }
-  }, [inputProps.value])
 
   const handleChange = (e) => {
     const newValue = e.target.value

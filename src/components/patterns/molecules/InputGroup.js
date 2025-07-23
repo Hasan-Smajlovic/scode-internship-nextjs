@@ -17,32 +17,31 @@ export default function InputGroup ({
   label = '',
   ...props
 }) {
-  if (type === 'checkbox') {
-    return (
-      <div className={`flex items-center justify-center mt-10 ${containerClassName}`}>
-        <Checkbox
-          label={label}
-          className={` ${className}`}
-          {...props}
-        />
-      </div>
-    )
-  }
+  switch (type) {
+    case 'checkbox':
+      return (
+        <div className={`flex items-center justify-center mt-10 ${containerClassName}`}>
+          <Checkbox
+            label={label}
+            className={` ${className}`}
+            {...props}
+          />
+        </div>
+      )
 
-  if (type === 'select') {
-    return (
-      <div className={`flex items-center justify-center mt-10 ${containerClassName}`}>
-        <Select
-          options={options}
-          label={label}
-          placeholder={placeholder}
-          className={`w-full max-w-md ${className}`}
-          {...props}
-        />
-      </div>
-    )
+    case 'select':
+      return (
+        <div className={`flex items-center justify-center mt-10 ${containerClassName}`}>
+          <Select
+            options={options}
+            label={label}
+            placeholder={placeholder}
+            className={`w-full max-w-md ${className}`}
+            {...props}
+          />
+        </div>
+      )
   }
-
   return (
     <div className={`flex items-center justify-center mt-10 ${containerClassName}`}>
       <div className='flex items-center justify-center border rounded px-2 py-1 w-full max-w-md'>

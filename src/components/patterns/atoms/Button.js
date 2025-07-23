@@ -8,6 +8,7 @@ export default function Button ({ children, variant = 'primary', className = '',
     primary   : 'bg-primary',
     secondary : 'bg-secondary'
   }
+
   return (
     <button
       className={`${base}${variants[variant]} ${className}`}
