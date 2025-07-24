@@ -6,7 +6,6 @@ import Icon from '../atoms/Icon'
 function Chip ({
   label,
   onClose,
-  className = '',
   icon = <MdClose />
 }) {
   const handleClose = (event) => {
@@ -31,10 +30,9 @@ function Chip ({
 }
 
 Chip.propTypes = {
-  label     : PropTypes.string.isRequired,
-  onClose   : PropTypes.func.isRequired,
-  className : PropTypes.string,
-  icon      : PropTypes.element
+  label   : PropTypes.string.isRequired,
+  onClose : PropTypes.func.isRequired,
+  icon    : PropTypes.element
 }
 
 export default Chip
