@@ -12,6 +12,9 @@ import Alert from '../../../components/patterns/atoms/Alert'
 import ApiTesting from './ApiTesting'
 import UploadFileForm from './UploadFileForm'
 
+import TextGroup from '@/components/patterns/molecules/TextGroup'
+import Multiselect from '@/components/patterns/molecules/Multiselect'
+
 export default function TemplatePage () {
   const [count, setCount] = useState(0)
 
@@ -107,6 +110,7 @@ export default function TemplatePage () {
         />
       </div>
 
+      <Multiselect />
       <div className='mt-8 p-4 border rounded'>
         <h2 className='text-xl font-bold mb-4'>Counter: {count}</h2>
         <div className='flex flex-wrap gap-2'>
@@ -118,6 +122,7 @@ export default function TemplatePage () {
       </div>
       <ApiTesting />
       <UploadFileForm />
+      <TextGroup icon={<FaUser />} />
     </div>
   )
 }

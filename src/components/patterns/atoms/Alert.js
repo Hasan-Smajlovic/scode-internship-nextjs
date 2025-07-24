@@ -64,7 +64,7 @@ export default function Alert ({ type = 'info', children, timeout = 5000, positi
         onClick={handleClose}
         aria-label='Close'
       >
-        <Icon icon={<MdClose />} className='h-4 w-4' />
+        <Icon name={<MdClose />} className='h-4 w-4' />
       </button>
     </div>
   )

@@ -72,7 +72,7 @@ export default function UploadInput ({
       <Button
         type='button'
         variant='secondary'
-        className='w-32 mb-4 ml-10'
+        className='w-29 mb-4 '
         onClick={handleFileReset}
       >
         Reset
