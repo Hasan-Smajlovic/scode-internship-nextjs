@@ -2,8 +2,8 @@ import PropTypes from 'prop-types'
 
 export default function Label ({ children, htmlFor, error, inputName }) {
   return (
-    <div className=' mt-2'>
-      <label htmlFor={htmlFor} className='block text-sm font-medium text-gray-700 text-center'>
+    <div className=''>
+      <label htmlFor={htmlFor} className='block text-sm font-medium text-gray-700'>
         {children}
       </label>
       {inputName && (

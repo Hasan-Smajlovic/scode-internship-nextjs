@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types'
-import Input from './Input'
 
-export default function Select ({ label, options = [], value, onChange, placeholder, className = '', ...rest }) {
+export default function Select ({
+  label,
+  options = [],
+  value,
+  onChange,
+  placeholder = 'Select an option',
+  className = '',
+  ...rest
+}) {
   return (
     <div className='mb-4'>
       {label && (
@@ -9,14 +16,21 @@ export default function Select ({ label, options = [], value, onChange, placehol
           {label}
         </label>
       )}
-      <Input
-        type='select'
-        options={options}
+      <select
         value={value}
         onChange={onChange}
-        className={` ${className}`}
+        className={`h-14 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
         {...rest}
-      />
+      >
+        <option value='' disabled hidden>
+          {placeholder}
+        </option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </div>
   )
 }

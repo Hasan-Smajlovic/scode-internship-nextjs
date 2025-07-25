@@ -19,7 +19,7 @@ export default function Multiselect ({
   value = [],
   className = '',
   disabled = false,
-  placeholder = 'Select options...'
+  placeholder = ''
 }) {
   const [selectedOptions, setSelectedOptions] = useState(value)
   const [open, setOpen] = useState(false)
@@ -85,7 +85,7 @@ export default function Multiselect ({
 
       <div className={`flex flex-wrap gap-2 ${className}`}>
         <Button
-          type='dropdown'
+          type='button'
           onClick={toggleDropdown}
           className={`w-26 rounded-md transition ${
             open ? 'bg-secondary text-white border-secondary' : 'bg-gray-200 text-gray-700 border-gray-300'
