@@ -3,16 +3,16 @@ import PropTypes from 'prop-types'
 export default function Label ({ children, htmlFor, error, inputName }) {
   return (
     <div className=''>
-      <label htmlFor={htmlFor} className='block text-sm font-medium text-gray-700'>
+      <label htmlFor={htmlFor} className='text-sm text-primary'>
         {children}
       </label>
       {inputName && (
-        <p className='text-sm text-primary mt-1'>
+        <p className='text-sm text-primary'>
           {inputName}
         </p>
       )}
       {error && (
-        <p className='text-sm text-danger mt-1'>
+        <p className='text-sm text-danger'>
           {error}
         </p>
       )}

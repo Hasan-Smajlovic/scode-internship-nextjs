@@ -16,7 +16,7 @@ function Chip ({
   }
 
   return (
-    <div className='w-29 h-10 bg-primary text-white inline-flex items-center justify-between px-2 py-1 border-2 rounded-md text-sm font-medium mb-2'>
+    <div className='w-29 h-10 bg-primary text-white inline-flex items-center justify-between px-2 py-1 border-2 rounded-md text-sm font-medium'>
       <span className='flex-grow'>{label}</span>
       <button
         onClick={handleClose}

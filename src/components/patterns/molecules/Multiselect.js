@@ -68,6 +68,7 @@ export default function Multiselect ({
     event.preventDefault()
     setSelectedOptions([])
     setOpen(false)
+    onChange([])
 
     Alert.show({
       type     : 'info',

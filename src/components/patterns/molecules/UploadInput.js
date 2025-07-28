@@ -26,13 +26,15 @@ export default function UploadInput ({
     fileInputRef.current.click()
   }
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0]
     if (!file) return
 
-    const supportedFileTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml']
+    const supportedFileTypes = [
+      'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'
+    ]
 
-    if (file && !supportedFileTypes.includes(file.type)) {
+    if (!supportedFileTypes.includes(file.type)) {
       alert('Unsupported file type. Please upload a valid image file.')
       return
     }
@@ -40,8 +42,26 @@ export default function UploadInput ({
     setFileType(file.type)
     setFileName(file.name)
 
-    if (onChange) {
-      onChange(file, targetFolder)
+    // Upload the file to the backend
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('targetFolder', targetFolder)
+
+    try {
+      const res = await fetch('/api/upload', {
+        method : 'POST',
+        body   : formData
+      })
+      const data = await res.json()
+      if (data.success && data.path) {
+        if (onChange) onChange(data.path) // Pass only the path string!
+      } else {
+        alert('Upload failed: ' + (data.error || 'Unknown error'))
+        if (onChange) onChange('')
+      }
+    } catch (err) {
+      alert('Upload failed: ' + err.message)
+      if (onChange) onChange('')
     }
   }
 
@@ -81,7 +101,6 @@ export default function UploadInput ({
         />
 
         <div className='flex flex-row gap-4 mb-6'>
-          {/* Button that triggers the file input */}
           <Button
             type='button'
             variant='primary'
@@ -103,10 +122,10 @@ export default function UploadInput ({
         </div>
 
         {fileName && (
-        <div className='mt-2 text-sm text-gray-500'>
-          <p>File type: {fileType}</p>
-          <p>Target Folder: {targetFolder}</p>
-        </div>
+          <div className='mt-2 text-sm text-gray-500'>
+            <p>File type: {fileType}</p>
+            <p>Target Folder: {targetFolder}</p>
+          </div>
         )}
       </div>
     </div>

@@ -50,7 +50,7 @@ export default function InputLabel ({
         {required && <span className='text-red-500 ml-1'>*</span>}
       </Label>
 
-      <div className={`flex items-center gap-3 bg-gray-100 p-2 rounded-md shadow-sm ${showError ? 'border border-warning' : ''}`}>
+      <div className={`flex mt-1 items-center gap-3 bg-gray-100 p-2 rounded-md shadow-sm ${showError ? 'border border-warning' : ''}`}>
         {icon && (
           <div className='flex-shrink-0'>
             <Icon className='text-gray-500 h-5 w-5'>
