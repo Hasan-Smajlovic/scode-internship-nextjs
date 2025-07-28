@@ -79,7 +79,7 @@ export default function Multiselect ({
   }
 
   return (
-    <div className=' relative dropdown-container justify-between flex flex-col items-start gap-1'>
+    <div className='mt-8 relative dropdown-container justify-between flex flex-col items-start gap-1'>
       <Label>
         {placeholder && <span className='text-gray-500 mt-10'>{placeholder}</span>}
       </Label>

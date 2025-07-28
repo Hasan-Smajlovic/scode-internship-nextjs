@@ -21,7 +21,7 @@ export default function Select ({
       <select
         value={value}
         onChange={onChange}
-        className={`h-17 px-4 border mt-2 border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
+        className={`h-18.5 px-4 border  border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
         {...rest}
       >
         <option value='' disabled hidden>

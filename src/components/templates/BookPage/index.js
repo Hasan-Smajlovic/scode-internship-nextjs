@@ -39,9 +39,11 @@ export default function BookFormApi ({
   const [formatState, setFormat] = useState(format)
   const [newReleaseState, setNewRelease] = useState(newRelease)
   const [keywordsState, setKeywords] = useState(keywords)
+  const [formKey, setFormKey] = useState(0)
 
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
   const handleResetForm = () => {
     setTitle('')
     setSubtitle('')
@@ -56,6 +58,7 @@ export default function BookFormApi ({
     setNewRelease(false)
     setKeywords('')
     setErrors({})
+    setFormKey(prev => prev + 1) // Force re-render for custom components
   }
 
   const handleResetGenre = (selected) => {
@@ -199,6 +202,7 @@ export default function BookFormApi ({
   return (
     <div className='flex justify-center items-center min-h-screen p-2 sm:p-4'>
       <form
+        key={formKey}
         onSubmit={handleSubmit}
         onKeyDown={preventEnterKey}
         className='w-full max-w-6xl'
@@ -248,6 +252,7 @@ export default function BookFormApi ({
               id='publisher'
               name='publisher'
               placeholder='Enter book publisher'
+              className='mt-2'
               value={publisherState}
               onChange={(e) => {
                 setPublisher(handleValue(e))
@@ -331,7 +336,7 @@ export default function BookFormApi ({
           <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6'>
             <div>
               {genreState.length > 0 && (
-                <div className={`flex flex-wrap gap-2 ${genreState.length === 0 ? '' : 'mb-2'}`}>
+                <div className={`flex flex-wrap gap-2 ${genreState.length === 0 ? '' : ''}`}>
                   {genreState.map((g, index) => (
                     <Chip
                       key={index}

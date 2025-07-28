@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 export default function Label ({ children, htmlFor, error, inputName }) {
   return (
     <div className=''>
-      <label htmlFor={htmlFor} className='text-sm text-primary'>
+      <label htmlFor={htmlFor} className='text-sm text-primary mt-1'>
         {children}
       </label>
       {inputName && (
