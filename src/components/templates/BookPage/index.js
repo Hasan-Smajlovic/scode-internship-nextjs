@@ -212,8 +212,8 @@ export default function BookFormApi ({
               name='title'
               placeholder='Enter book title'
               value={titleState}
-              onChange={(e) => {
-                setTitle(handleValue(e))
+              onChange={(event) => {
+                setTitle(handleValue(event))
                 if (errors.title) setErrors({ ...errors, title: '' })
               }}
               error={errors.title}
@@ -225,8 +225,8 @@ export default function BookFormApi ({
               name='subtitle'
               placeholder='Enter book subtitle'
               value={subtitleState}
-              onChange={(e) => {
-                setSubtitle(handleValue(e))
+              onChange={(event) => {
+                setSubtitle(handleValue(event))
                 if (errors.subtitle) setErrors({ ...errors, subtitle: '' })
               }}
               error={errors.subtitle}
@@ -251,8 +251,8 @@ export default function BookFormApi ({
               placeholder='Enter book publisher'
               className='mt-2'
               value={publisherState}
-              onChange={(e) => {
-                setPublisher(handleValue(e))
+              onChange={(event) => {
+                setPublisher(handleValue(event))
                 if (errors.publisher) setErrors({ ...errors, publisher: '' })
               }}
               error={errors.publisher}
@@ -267,8 +267,8 @@ export default function BookFormApi ({
               type='number'
               placeholder='Enter page count'
               value={pageCountState}
-              onChange={(e) => {
-                setPageCount(handleValue(e))
+              onChange={(event) => {
+                setPageCount(handleValue(event))
                 setErrors({ ...errors, pageCount: '' })
               }}
               error={errors.pageCount}
@@ -284,8 +284,8 @@ export default function BookFormApi ({
               value={typeof keywordsState === 'string'
                 ? keywordsState
                 : Array.isArray(keywordsState) ? keywordsState.join(', ') : ''}
-              onChange={(e) => {
-                setKeywords(handleValue(e))
+              onChange={(event) => {
+                setKeywords(handleValue(event))
                 if (errors.keywords) setErrors({ ...errors, keywords: '' })
               }}
               label='Keywords'
@@ -322,8 +322,8 @@ export default function BookFormApi ({
               label='Published Date'
               placeholder='Select published date'
               value={publishedDateState}
-              onChange={(e) => {
-                setPublishedDate(handleValue(e))
+              onChange={(event) => {
+                setPublishedDate(handleValue(event))
                 if (errors.publishedDate) setErrors({ ...errors, publishedDate: '' })
               }}
               error={errors.publishedDate}
@@ -371,8 +371,8 @@ export default function BookFormApi ({
               name='shortDescription'
               placeholder='Enter a short description of the book'
               value={shortDescriptionState}
-              onChange={(val) => {
-                setShortDescription(handleValue(val))
+              onChange={(event) => {
+                setShortDescription(handleValue(event))
                 if (errors.shortDescription) setErrors({ ...errors, shortDescription: '' })
               }}
               error={errors.shortDescription}
@@ -386,7 +386,7 @@ export default function BookFormApi ({
               id='newRelease'
               name='newRelease'
               checked={newReleaseState}
-              onChange={(e) => setNewRelease(e.target.checked)}
+              onChange={(event) => setNewRelease(event.target.checked)}
               className='mr-2 h-4 w-4 sm:h-5 sm:w-5'
             />
             <label htmlFor='newRelease' className='text-sm sm:text-base text-gray-700'>
