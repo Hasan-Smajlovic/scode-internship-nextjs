@@ -9,6 +9,7 @@ import UploadInput from '@/components/patterns/molecules/UploadInput'
 import Button from '@/components/patterns/atoms/Button'
 import InputLabel from '@/components/patterns/molecules/InputLabel'
 import Select from '@/components/patterns/atoms/Select'
+import Chip from '@/components/patterns/atoms/Chip'
 import AuthorInput from '@/components/patterns/molecules/AuthorInput'
 
 export default function BookFormApi ({
@@ -42,7 +43,7 @@ export default function BookFormApi ({
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleResetForm = (event) => {
+  const handleResetForm = () => {
     setTitle('')
     setSubtitle('')
     setAuthors([{ name: '', image: '' }])
@@ -175,27 +176,18 @@ export default function BookFormApi ({
         timeout  : 3000
       })
     }
-    console.log('Form submitted with data:', {
-      title            : titleState,
-      subtitle         : subtitleState,
-      authors          : authorsState,
-      publisher        : publisherState,
-      publishedDate    : publishedDateState,
-      pageCount        : pageCountState,
-      genre            : genreState,
-      cover            : coverState,
-      shortDescription : shortDescriptionState,
-      format           : formatState,
-      newRelease       : newReleaseState,
-      keywords         : typeof keywordsState === 'string'
-        ? keywordsState.split(',').map(k => k.trim()).filter(Boolean)
-        : keywordsState
-    })
   }
 
   const handleValue = (event) => {
     return event && event.target ? event.target.value : event
   }
+
+  const handleDeleteGenre = (index) => {
+    const updated = genreState.filter((_, i) => i !== index)
+    setGenre(updated)
+    if (errors.genre) setErrors({ ...errors, genre: '' })
+  }
+
   return (
     <div className='flex justify-center items-center min-h-screen p-2 sm:p-4'>
       <form
@@ -212,8 +204,8 @@ export default function BookFormApi ({
               name='title'
               placeholder='Enter book title'
               value={titleState}
-              onChange={(event) => {
-                setTitle(handleValue(event))
+              onChange={(e) => {
+                setTitle(handleValue(e))
                 if (errors.title) setErrors({ ...errors, title: '' })
               }}
               error={errors.title}
@@ -225,8 +217,8 @@ export default function BookFormApi ({
               name='subtitle'
               placeholder='Enter book subtitle'
               value={subtitleState}
-              onChange={(event) => {
-                setSubtitle(handleValue(event))
+              onChange={(e) => {
+                setSubtitle(handleValue(e))
                 if (errors.subtitle) setErrors({ ...errors, subtitle: '' })
               }}
               error={errors.subtitle}
@@ -251,8 +243,8 @@ export default function BookFormApi ({
               placeholder='Enter book publisher'
               className='mt-2'
               value={publisherState}
-              onChange={(event) => {
-                setPublisher(handleValue(event))
+              onChange={(e) => {
+                setPublisher(handleValue(e))
                 if (errors.publisher) setErrors({ ...errors, publisher: '' })
               }}
               error={errors.publisher}
@@ -267,8 +259,8 @@ export default function BookFormApi ({
               type='number'
               placeholder='Enter page count'
               value={pageCountState}
-              onChange={(event) => {
-                setPageCount(handleValue(event))
+              onChange={(e) => {
+                setPageCount(handleValue(e))
                 setErrors({ ...errors, pageCount: '' })
               }}
               error={errors.pageCount}
@@ -284,8 +276,8 @@ export default function BookFormApi ({
               value={typeof keywordsState === 'string'
                 ? keywordsState
                 : Array.isArray(keywordsState) ? keywordsState.join(', ') : ''}
-              onChange={(event) => {
-                setKeywords(handleValue(event))
+              onChange={(e) => {
+                setKeywords(handleValue(e))
                 if (errors.keywords) setErrors({ ...errors, keywords: '' })
               }}
               label='Keywords'
@@ -322,15 +314,16 @@ export default function BookFormApi ({
               label='Published Date'
               placeholder='Select published date'
               value={publishedDateState}
-              onChange={(event) => {
-                setPublishedDate(handleValue(event))
+              onChange={(e) => {
+                setPublishedDate(handleValue(e))
                 if (errors.publishedDate) setErrors({ ...errors, publishedDate: '' })
               }}
               error={errors.publishedDate}
             />
           </div>
+
           <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6'>
-            <div className='w-full'>
+            <div>
               <Multiselect
                 id='genre'
                 name='genre'
@@ -367,12 +360,13 @@ export default function BookFormApi ({
           </div>
           <div className='mb-4 sm:mb-6'>
             <InputLabel
+              id='shortDescription'
               label='Short Description'
               name='shortDescription'
               placeholder='Enter a short description of the book'
               value={shortDescriptionState}
-              onChange={(event) => {
-                setShortDescription(handleValue(event))
+              onChange={(val) => {
+                setShortDescription(handleValue(val))
                 if (errors.shortDescription) setErrors({ ...errors, shortDescription: '' })
               }}
               error={errors.shortDescription}
@@ -386,7 +380,7 @@ export default function BookFormApi ({
               id='newRelease'
               name='newRelease'
               checked={newReleaseState}
-              onChange={(event) => setNewRelease(event.target.checked)}
+              onChange={(e) => setNewRelease(e.target.checked)}
               className='mr-2 h-4 w-4 sm:h-5 sm:w-5'
             />
             <label htmlFor='newRelease' className='text-sm sm:text-base text-gray-700'>

@@ -1,5 +1,3 @@
-'use client'
-
 import { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Label from '../atoms/Label'
@@ -13,13 +11,12 @@ export default function UploadInput ({
   onReset,
   className = '',
   accept = 'image/*',
-  targetFolder = 'photosUploadsFolder',
-  authorName = '', // <-- pass authorName for filename
+  targetFolder = 'uploads',
+  authorName = '',
   description,
   error,
   ...rest
 }) {
-  const [fileType, setFileType] = useState('')
   const [fileName, setFileName] = useState('')
   const fileInputRef = useRef(null)
 
@@ -31,19 +28,6 @@ export default function UploadInput ({
     const file = event.target.files[0]
     if (!file) return
 
-    const supportedFileTypes = [
-      'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/svg+xml'
-    ]
-
-    if (!supportedFileTypes.includes(file.type)) {
-      alert('Unsupported file type. Please upload a valid image file.')
-      return
-    }
-
-    setFileType(file.type)
-    setFileName(file.name)
-
-    // Format filename: /220px-Author_Name.jpg
     const ext = file.name.split('.').pop()
     const safeName = (authorName || 'Author').replace(/[^a-z0-9]/gi, '_')
     const formattedName = `220px-${safeName}.${ext}`
@@ -60,6 +44,7 @@ export default function UploadInput ({
       })
       const data = await res.json()
       if (data.success && data.path) {
+        setFileName(formattedName)
         if (onChange) onChange(data.path)
       } else {
         alert('Upload failed: ' + (data.error || 'Unknown error'))
@@ -75,16 +60,15 @@ export default function UploadInput ({
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
-    setFileType('')
     setFileName('')
     if (onReset) onReset()
     if (onChange) onChange('')
   }
 
   return (
-    <div className={`upload-input ${className}`}>
+    <div className={`upload-input mt-3 ${className}`}>
       <Label>
-        {placeholder && <span className='text-primary mt-10'>{placeholder}</span>}
+        {placeholder && <span className='text-primary'>{placeholder}</span>}
       </Label>
       <div className='relative mt-2'>
         <div className='mb-2 text-sm text-gray-500'>
@@ -99,7 +83,7 @@ export default function UploadInput ({
           onChange={handleFileChange}
           {...rest}
         />
-        <div className='flex flex-row gap-4 '>
+        <div className='flex flex-row gap-4'>
           <Button
             type='button'
             variant='primary'
@@ -118,12 +102,6 @@ export default function UploadInput ({
             Reset
           </Button>
         </div>
-        {fileName && (
-          <div className='mt-2 text-sm text-gray-500'>
-            <p>File type: {fileType}</p>
-            <p>Target Folder: {targetFolder}</p>
-          </div>
-        )}
         {error && (
           <div className='text-red-500 text-xs mt-1'>{error}</div>
         )}

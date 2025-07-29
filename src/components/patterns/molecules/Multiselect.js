@@ -73,7 +73,7 @@ export default function Multiselect ({
   }
 
   return (
-    <div className='relative dropdown-container justify-between flex flex-col items-start gap-1'>
+    <div className='relative dropdown-container justify-between flex flex-col items-start gap-1 mt-4'>
       {label && (
       <label className='block text-primary'>
         {label}

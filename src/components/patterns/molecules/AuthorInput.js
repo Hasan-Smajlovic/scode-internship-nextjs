@@ -26,6 +26,7 @@ export default function AuthorInput ({ authors, onChange, error }) {
     <div className='space-y-1'>
       <div className='flex justify-between items-center'>
         <Label className='block text-sm font-medium text-gray-700'>Authors</Label>
+
       </div>
       {authors.map((author, index) => (
         <div key={index} className='relative'>
@@ -41,37 +42,33 @@ export default function AuthorInput ({ authors, onChange, error }) {
               </button>
             )}
           </div>
-          <div className='mb-4'>
-            <InputLabel
-              id={`author-name-${index}`}
-              name={`author-name-${index}`}
-              placeholder='Enter author name'
-              value={author.name || ''}
-              onChange={(e) => updateAuthor(index, 'name', e.target.value)}
-              icon={<FaUser />}
-              error={error && (!author.name || !author.image) ? error : ''}
-            />
-          </div>
-          <div>
-            <UploadInput
-              name={`author-image-${index}`}
-              label={`Author ${index + 1} Image`}
-              placeholder='Upload author image'
-              accept='image/*'
-              targetFolder='authors'
-              authorName={author.name || `Author${index + 1}`} // Pass author name for filename
-              onChange={(imagePath) => {
-                updateAuthor(index, 'image', imagePath)
-              }}
-              onReset={() => updateAuthor(index, 'image', '')}
-              error={error && (!author.name || !author.image) ? error : ''}
-            />
-            {author.image && (
-              <p className='mt-1 text-sm text-gray-500'>
-                Selected image: {author.image}
-              </p>
-            )}
-          </div>
+          <InputLabel
+            id={`author-name-${index}`}
+            name={`author-name-${index}`}
+            placeholder='Enter author name'
+            value={author.name || ''}
+            onChange={(e) => updateAuthor(index, 'name', e.target.value)}
+            icon={<FaUser />}
+            error={error && (!author.name || !author.image) ? error : ''}
+          />
+          <UploadInput
+            name={`author-image-${index}`}
+            label={`Author ${index + 1} Image`}
+            placeholder='Upload author image'
+            accept='image/*'
+            targetFolder='authors'
+            authorName={author.name || `Author${index + 1}`}
+            onChange={(imagePath) => {
+              updateAuthor(index, 'image', imagePath)
+            }}
+            onReset={() => updateAuthor(index, 'image', '')}
+            error={error && (!author.name || !author.image) ? error : ''}
+          />
+          {author.image && (
+            <p className='mt-1 text-sm text-gray-500'>
+              Selected image: {author.image}
+            </p>
+          )}
         </div>
       ))}
       {authors.length === 0 && (
