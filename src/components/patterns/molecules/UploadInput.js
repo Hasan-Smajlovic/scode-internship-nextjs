@@ -2,7 +2,6 @@
 
 import { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
-
 import Label from '../atoms/Label'
 import Button from '../atoms/Button'
 
@@ -15,7 +14,9 @@ export default function UploadInput ({
   className = '',
   accept = 'image/*',
   targetFolder = 'photosUploadsFolder',
+  authorName = '', // <-- pass authorName for filename
   description,
+  error,
   ...rest
 }) {
   const [fileType, setFileType] = useState('')
@@ -42,10 +43,15 @@ export default function UploadInput ({
     setFileType(file.type)
     setFileName(file.name)
 
-    // Upload the file to the backend
+    // Format filename: /220px-Author_Name.jpg
+    const ext = file.name.split('.').pop()
+    const safeName = (authorName || 'Author').replace(/[^a-z0-9]/gi, '_')
+    const formattedName = `220px-${safeName}.${ext}`
+
     const formData = new FormData()
     formData.append('file', file)
     formData.append('targetFolder', targetFolder)
+    formData.append('fileName', formattedName)
 
     try {
       const res = await fetch('/api/upload', {
@@ -54,7 +60,7 @@ export default function UploadInput ({
       })
       const data = await res.json()
       if (data.success && data.path) {
-        if (onChange) onChange(data.path) // Pass only the path string!
+        if (onChange) onChange(data.path)
       } else {
         alert('Upload failed: ' + (data.error || 'Unknown error'))
         if (onChange) onChange('')
@@ -66,30 +72,24 @@ export default function UploadInput ({
   }
 
   const handleFileReset = () => {
-    // Reset the file input value
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
-
     setFileType('')
     setFileName('')
-
-    if (onReset) {
-      onReset()
-    }
+    if (onReset) onReset()
+    if (onChange) onChange('')
   }
 
   return (
     <div className={`upload-input ${className}`}>
       <Label>
-        {placeholder && <span className='text-gray-500 mt-10'>{placeholder}</span>}
+        {placeholder && <span className='text-primary mt-10'>{placeholder}</span>}
       </Label>
-
       <div className='relative mt-2'>
         <div className='mb-2 text-sm text-gray-500'>
           {fileName ? `Selected: ${fileName}` : 'No file chosen'}
         </div>
-
         <input
           ref={fileInputRef}
           id={`file-upload-${label}`}
@@ -99,8 +99,7 @@ export default function UploadInput ({
           onChange={handleFileChange}
           {...rest}
         />
-
-        <div className='flex flex-row gap-4 mb-6'>
+        <div className='flex flex-row gap-4 '>
           <Button
             type='button'
             variant='primary'
@@ -109,7 +108,6 @@ export default function UploadInput ({
           >
             Choose file
           </Button>
-
           <Button
             type='button'
             variant='secondary'
@@ -120,12 +118,14 @@ export default function UploadInput ({
             Reset
           </Button>
         </div>
-
         {fileName && (
           <div className='mt-2 text-sm text-gray-500'>
             <p>File type: {fileType}</p>
             <p>Target Folder: {targetFolder}</p>
           </div>
+        )}
+        {error && (
+          <div className='text-red-500 text-xs mt-1'>{error}</div>
         )}
       </div>
     </div>
@@ -141,5 +141,7 @@ UploadInput.propTypes = {
   accept       : PropTypes.string,
   label        : PropTypes.string,
   targetFolder : PropTypes.string,
-  description  : PropTypes.string
+  authorName   : PropTypes.string,
+  description  : PropTypes.string,
+  error        : PropTypes.string
 }

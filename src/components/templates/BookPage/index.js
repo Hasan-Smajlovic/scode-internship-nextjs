@@ -8,9 +8,7 @@ import Multiselect from '@/components/patterns/molecules/Multiselect'
 import UploadInput from '@/components/patterns/molecules/UploadInput'
 import Button from '@/components/patterns/atoms/Button'
 import InputLabel from '@/components/patterns/molecules/InputLabel'
-import TextGroup from '@/components/patterns/molecules/TextGroup'
 import Select from '@/components/patterns/atoms/Select'
-import Chip from '@/components/patterns/atoms/Chip'
 import AuthorInput from '@/components/patterns/molecules/AuthorInput'
 
 export default function BookFormApi ({
@@ -44,7 +42,7 @@ export default function BookFormApi ({
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleResetForm = () => {
+  const handleResetForm = (event) => {
     setTitle('')
     setSubtitle('')
     setAuthors([{ name: '', image: '' }])
@@ -58,7 +56,13 @@ export default function BookFormApi ({
     setNewRelease(false)
     setKeywords('')
     setErrors({})
-    setFormKey(prev => prev + 1) // Force re-render for custom components
+    setFormKey(prev => prev + 1)
+    Alert.show({
+      type     : 'success',
+      children : 'Form has been reset successfully!',
+      position : 'top-center',
+      timeout  : 3000
+    })
   }
 
   const handleResetGenre = (selected) => {
@@ -192,13 +196,6 @@ export default function BookFormApi ({
   const handleValue = (event) => {
     return event && event.target ? event.target.value : event
   }
-
-  const handleDeleteGenre = (index) => {
-    const updated = genreState.filter((_, i) => i !== index)
-    setGenre(updated)
-    if (errors.genre) setErrors({ ...errors, genre: '' })
-  }
-
   return (
     <div className='flex justify-center items-center min-h-screen p-2 sm:p-4'>
       <form
@@ -332,21 +329,8 @@ export default function BookFormApi ({
               error={errors.publishedDate}
             />
           </div>
-
           <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6'>
-            <div>
-              {genreState.length > 0 && (
-                <div className={`flex flex-wrap gap-2 ${genreState.length === 0 ? '' : ''}`}>
-                  {genreState.map((g, index) => (
-                    <Chip
-                      key={index}
-                      label={g}
-                      onClose={() => handleDeleteGenre(index)}
-                    />
-                  ))}
-                </div>
-              )}
-
+            <div className='w-full'>
               <Multiselect
                 id='genre'
                 name='genre'
@@ -382,7 +366,7 @@ export default function BookFormApi ({
             />
           </div>
           <div className='mb-4 sm:mb-6'>
-            <TextGroup
+            <InputLabel
               label='Short Description'
               name='shortDescription'
               placeholder='Enter a short description of the book'

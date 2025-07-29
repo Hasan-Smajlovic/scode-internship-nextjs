@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 
 import Button from '../atoms/Button'
 import Label from '../atoms/Label'
-import Alert from '../atoms/Alert'
 
 export default function Multiselect ({
   options = [
@@ -19,7 +18,8 @@ export default function Multiselect ({
   value = [],
   className = '',
   disabled = false,
-  placeholder = ''
+  placeholder = '',
+  label = 'Select options'
 }) {
   const [selectedOptions, setSelectedOptions] = useState(value)
   const [open, setOpen] = useState(false)
@@ -54,10 +54,10 @@ export default function Multiselect ({
 
     if (selectedOptions.includes(selectedValue)) {
       updated = selectedOptions.filter(option => option !== selectedValue)
-      console.log('My selected options are:', updated)
+      console.log('My selected options are:', [updated])
     } else {
       updated = [...selectedOptions, selectedValue]
-      console.log('My selected options are:', updated)
+      console.log('My selected options are:', [updated])
     }
 
     setSelectedOptions(updated)
@@ -69,19 +69,18 @@ export default function Multiselect ({
     setSelectedOptions([])
     setOpen(false)
     onChange([])
-
-    Alert.show({
-      type     : 'info',
-      children : 'Multiselect reset',
-      position : 'top-center',
-      timeout  : 3000
-    })
+    console.log('Multiselect has been reset. Selected options are now:', [])
   }
 
   return (
-    <div className='mt-8 relative dropdown-container justify-between flex flex-col items-start gap-1'>
+    <div className='relative dropdown-container justify-between flex flex-col items-start gap-1'>
+      {label && (
+      <label className='block text-primary'>
+        {label}
+      </label>
+      )}
       <Label>
-        {placeholder && <span className='text-gray-500 mt-10'>{placeholder}</span>}
+        {placeholder && <span className='text-gray-500'>{placeholder}</span>}
       </Label>
 
       <div className={`flex flex-wrap gap-2 ${className}`}>
@@ -145,5 +144,6 @@ Multiselect.propTypes = {
   value       : PropTypes.arrayOf(PropTypes.string),
   className   : PropTypes.string,
   disabled    : PropTypes.bool,
-  placeholder : PropTypes.string
+  placeholder : PropTypes.string,
+  label       : PropTypes.string
 }

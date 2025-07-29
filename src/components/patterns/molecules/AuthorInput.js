@@ -1,7 +1,5 @@
-'use client'
 import { FaUser, FaTimes } from 'react-icons/fa'
 import PropTypes from 'prop-types'
-
 import InputLabel from '@/components/patterns/molecules/InputLabel'
 import UploadInput from '@/components/patterns/molecules/UploadInput'
 import Alert from '../atoms/Alert'
@@ -29,7 +27,6 @@ export default function AuthorInput ({ authors, onChange, error }) {
       <div className='flex justify-between items-center'>
         <Label className='block text-sm font-medium text-gray-700'>Authors</Label>
       </div>
-
       {authors.map((author, index) => (
         <div key={index} className='relative'>
           <div className='absolute top-2 right-2'>
@@ -44,7 +41,6 @@ export default function AuthorInput ({ authors, onChange, error }) {
               </button>
             )}
           </div>
-
           <div className='mb-4'>
             <InputLabel
               id={`author-name-${index}`}
@@ -56,7 +52,6 @@ export default function AuthorInput ({ authors, onChange, error }) {
               error={error && (!author.name || !author.image) ? error : ''}
             />
           </div>
-
           <div>
             <UploadInput
               name={`author-image-${index}`}
@@ -64,10 +59,12 @@ export default function AuthorInput ({ authors, onChange, error }) {
               placeholder='Upload author image'
               accept='image/*'
               targetFolder='authors'
-              onChange={(file) => {
-                const imagePath = file ? (typeof file === 'string' ? file : file.name || '') : ''
+              authorName={author.name || `Author${index + 1}`} // Pass author name for filename
+              onChange={(imagePath) => {
                 updateAuthor(index, 'image', imagePath)
               }}
+              onReset={() => updateAuthor(index, 'image', '')}
+              error={error && (!author.name || !author.image) ? error : ''}
             />
             {author.image && (
               <p className='mt-1 text-sm text-gray-500'>
@@ -78,7 +75,7 @@ export default function AuthorInput ({ authors, onChange, error }) {
         </div>
       ))}
       {authors.length === 0 && (
-      <Alert type='warning'>At least one author is required</Alert>
+        <Alert type='warning'>At least one author is required</Alert>
       )}
     </div>
   )
