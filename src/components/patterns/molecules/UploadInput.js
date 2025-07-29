@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import Label from '../atoms/Label'
 import Button from '../atoms/Button'
-
 export default function UploadInput ({
   type = 'file',
   placeholder = 'Upload file',
@@ -27,11 +26,57 @@ export default function UploadInput ({
   const handleFileChange = async (event) => {
     const file = event.target.files[0]
     if (!file) return
+    if (authorName) {
+      // Only allow jpg/jpeg
+      if (!file.type.match(/^image\/jpeg$/)) {
+        alert('Only JPG images are allowed for author photos.')
+        if (onChange) onChange('')
+        return
+      }
 
-    const ext = file.name.split('.').pop()
-    const safeName = (authorName || 'Author').replace(/[^a-z0-9]/gi, '_')
-    const formattedName = `220px-${safeName}.${ext}`
+      // Check width
+      const img = new window.Image()
+      img.onload = async function () {
+        if (img.width !== 220) {
+          alert('Image width must be exactly 220px for author photos.')
+          if (onChange) onChange('')
+          return
+        }
+        const ext = file.name.split('.').pop()
+        const safeName = authorName.replace(/[^a-z0-9]/gi, '_')
+        const formattedName = `220px-${safeName}.${ext}`
 
+        const formData = new FormData()
+        formData.append('file', file)
+        formData.append('targetFolder', targetFolder)
+        formData.append('fileName', formattedName)
+
+        try {
+          const res = await fetch('/api/upload', {
+            method : 'POST',
+            body   : formData
+          })
+          const data = await res.json()
+          if (data.success && data.path) {
+            setFileName(formattedName)
+            if (onChange) onChange(data.path)
+          } else {
+            alert('Upload failed: ' + (data.error || 'Unknown error'))
+            if (onChange) onChange('')
+          }
+        } catch (err) {
+          alert('Upload failed: ' + err.message)
+          if (onChange) onChange('')
+        }
+      }
+      img.onerror = function () {
+        alert('Invalid image file.')
+        if (onChange) onChange('')
+      }
+      img.src = URL.createObjectURL(file)
+      return
+    }
+    const formattedName = file.name
     const formData = new FormData()
     formData.append('file', file)
     formData.append('targetFolder', targetFolder)
@@ -72,13 +117,13 @@ export default function UploadInput ({
       </Label>
       <div className='relative mt-2'>
         <div className='mb-2 text-sm text-gray-500'>
-          {fileName ? `Selected: ${fileName}` : 'No file chosen'}
+          {fileName ? `Selected: ${fileName} cover` : 'No file chosen'}
         </div>
         <input
           ref={fileInputRef}
           id={`file-upload-${label}`}
           type={type}
-          accept={accept}
+          accept={authorName ? '.jpg,.jpeg,image/jpeg' : accept}
           className='hidden'
           onChange={handleFileChange}
           {...rest}

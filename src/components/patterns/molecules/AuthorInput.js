@@ -64,11 +64,7 @@ export default function AuthorInput ({ authors, onChange, error }) {
             onReset={() => updateAuthor(index, 'image', '')}
             error={error && (!author.name || !author.image) ? error : ''}
           />
-          {author.image && (
-            <p className='mt-1 text-sm text-gray-500'>
-              Selected image: {author.image}
-            </p>
-          )}
+
         </div>
       ))}
       {authors.length === 0 && (

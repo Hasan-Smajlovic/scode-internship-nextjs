@@ -9,7 +9,6 @@ import UploadInput from '@/components/patterns/molecules/UploadInput'
 import Button from '@/components/patterns/atoms/Button'
 import InputLabel from '@/components/patterns/molecules/InputLabel'
 import Select from '@/components/patterns/atoms/Select'
-import Chip from '@/components/patterns/atoms/Chip'
 import AuthorInput from '@/components/patterns/molecules/AuthorInput'
 
 export default function BookFormApi ({
@@ -114,6 +113,7 @@ export default function BookFormApi ({
       event.preventDefault()
     }
   }
+
   const handleSubmit = (event) => {
     event.preventDefault()
     if (validateForm()) {
@@ -152,8 +152,50 @@ export default function BookFormApi ({
               timeout  : 3000
             })
             handleResetForm()
+          } else if (Array.isArray(data.error)) {
+            const fieldErrors = {}
+            const errorMessages = []
+            data.error.forEach(err => {
+              if (err.path && err.path.length > 0) {
+                const key = err.path[0]
+                if (fieldErrors[key]) {
+                  fieldErrors[key] += '\n' + err.message
+                } else {
+                  fieldErrors[key] = err.message
+                }
+                errorMessages.push(`${err.path.join('.')}: ${err.message}`)
+              } else if (err.message) {
+                errorMessages.push(err.message)
+              }
+            })
+            setErrors(fieldErrors)
+            Alert.show({
+              type     : 'error',
+              children : (
+                <div>
+                  <div>Please correct the following errors:</div>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {errorMessages.map((msg, i) => <li key={i}>{msg}</li>)}
+                  </ul>
+                </div>
+              ),
+              position : 'top-center',
+              timeout  : 7000
+            })
+          } else if (typeof data.error === 'string') {
+            Alert.show({
+              type     : 'error',
+              children : data.error,
+              position : 'top-center',
+              timeout  : 3000
+            })
           } else {
-            throw new Error(data.error || 'Failed to submit book')
+            Alert.show({
+              type     : 'error',
+              children : 'Please correct the errors in the form.',
+              position : 'top-center',
+              timeout  : 3000
+            })
           }
         })
         .catch(error => {
@@ -182,12 +224,6 @@ export default function BookFormApi ({
     return event && event.target ? event.target.value : event
   }
 
-  const handleDeleteGenre = (index) => {
-    const updated = genreState.filter((_, i) => i !== index)
-    setGenre(updated)
-    if (errors.genre) setErrors({ ...errors, genre: '' })
-  }
-
   return (
     <div className='flex justify-center items-center min-h-screen p-2 sm:p-4'>
       <form
@@ -204,8 +240,8 @@ export default function BookFormApi ({
               name='title'
               placeholder='Enter book title'
               value={titleState}
-              onChange={(e) => {
-                setTitle(handleValue(e))
+              onChange={(event) => {
+                setTitle(handleValue(event))
                 if (errors.title) setErrors({ ...errors, title: '' })
               }}
               error={errors.title}
@@ -217,8 +253,8 @@ export default function BookFormApi ({
               name='subtitle'
               placeholder='Enter book subtitle'
               value={subtitleState}
-              onChange={(e) => {
-                setSubtitle(handleValue(e))
+              onChange={(event) => {
+                setSubtitle(handleValue(event))
                 if (errors.subtitle) setErrors({ ...errors, subtitle: '' })
               }}
               error={errors.subtitle}
@@ -243,8 +279,8 @@ export default function BookFormApi ({
               placeholder='Enter book publisher'
               className='mt-2'
               value={publisherState}
-              onChange={(e) => {
-                setPublisher(handleValue(e))
+              onChange={(event) => {
+                setPublisher(handleValue(event))
                 if (errors.publisher) setErrors({ ...errors, publisher: '' })
               }}
               error={errors.publisher}
@@ -259,8 +295,8 @@ export default function BookFormApi ({
               type='number'
               placeholder='Enter page count'
               value={pageCountState}
-              onChange={(e) => {
-                setPageCount(handleValue(e))
+              onChange={(event) => {
+                setPageCount(handleValue(event))
                 setErrors({ ...errors, pageCount: '' })
               }}
               error={errors.pageCount}
@@ -276,8 +312,8 @@ export default function BookFormApi ({
               value={typeof keywordsState === 'string'
                 ? keywordsState
                 : Array.isArray(keywordsState) ? keywordsState.join(', ') : ''}
-              onChange={(e) => {
-                setKeywords(handleValue(e))
+              onChange={(event) => {
+                setKeywords(handleValue(event))
                 if (errors.keywords) setErrors({ ...errors, keywords: '' })
               }}
               label='Keywords'
@@ -314,16 +350,15 @@ export default function BookFormApi ({
               label='Published Date'
               placeholder='Select published date'
               value={publishedDateState}
-              onChange={(e) => {
-                setPublishedDate(handleValue(e))
+              onChange={(event) => {
+                setPublishedDate(handleValue(event))
                 if (errors.publishedDate) setErrors({ ...errors, publishedDate: '' })
               }}
               error={errors.publishedDate}
             />
           </div>
-
           <div className='grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6'>
-            <div>
+            <div className='w-full'>
               <Multiselect
                 id='genre'
                 name='genre'
@@ -360,34 +395,31 @@ export default function BookFormApi ({
           </div>
           <div className='mb-4 sm:mb-6'>
             <InputLabel
-              id='shortDescription'
               label='Short Description'
               name='shortDescription'
               placeholder='Enter a short description of the book'
               value={shortDescriptionState}
-              onChange={(val) => {
-                setShortDescription(handleValue(val))
+              onChange={(event) => {
+                setShortDescription(handleValue(event))
                 if (errors.shortDescription) setErrors({ ...errors, shortDescription: '' })
               }}
               error={errors.shortDescription}
               rows={3}
             />
           </div>
-
           <div className='flex items-center mb-4 sm:mb-6'>
             <input
               type='checkbox'
               id='newRelease'
               name='newRelease'
               checked={newReleaseState}
-              onChange={(e) => setNewRelease(e.target.checked)}
+              onChange={(event) => setNewRelease(event.target.checked)}
               className='mr-2 h-4 w-4 sm:h-5 sm:w-5'
             />
             <label htmlFor='newRelease' className='text-sm sm:text-base text-gray-700'>
               Mark as New Release
             </label>
           </div>
-
           <div className='flex flex-col sm:flex-row justify-center gap-3 mt-4 sm:mt-6'>
             <Button variant='primary' type='submit' disabled={isSubmitting} className='w-full sm:w-auto'>
               {isSubmitting ? <span>Submitting...</span> : <span>Submit Book Details</span>}
@@ -412,7 +444,7 @@ BookFormApi.propTypes = {
   subtitle : PropTypes.string,
   authors  : PropTypes.arrayOf(PropTypes.shape({
     name  : PropTypes.string.isRequired,
-    image : PropTypes.string
+    image : PropTypes.string.isRequired
   })),
   publisher        : PropTypes.string,
   publishedDate    : PropTypes.string,
@@ -422,5 +454,8 @@ BookFormApi.propTypes = {
   shortDescription : PropTypes.string,
   format           : PropTypes.string,
   newRelease       : PropTypes.bool,
-  keywords         : PropTypes.oneOfType([PropTypes.string, PropTypes.array])
+  keywords         : PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string)
+  ])
 }
