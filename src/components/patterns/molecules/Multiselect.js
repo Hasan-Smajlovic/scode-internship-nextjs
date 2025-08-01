@@ -15,22 +15,21 @@ export default function Multiselect ({
     { value: 'Internship', label: 'Internship' }
   ],
   onChange = () => {},
-  value = [],
+  value = [], // controlled prop
   className = '',
   disabled = false,
   placeholder = '',
   label = 'Select options'
 }) {
-  const [selectedOptions, setSelectedOptions] = useState(value)
   const [open, setOpen] = useState(false)
 
   const toggleDropdown = (event) => {
     if (disabled) return
     if (!open) {
-      document.addEventListener('click', handleGlobalClick)
+      document.addEventListener('click', handleGlobalClick, true) // <-- useCapture = true
       document.addEventListener('keydown', handleEscape)
     } else {
-      document.removeEventListener('click', handleGlobalClick)
+      document.removeEventListener('click', handleGlobalClick, true) // <-- must match the above
       document.removeEventListener('keydown', handleEscape)
     }
     setOpen(prev => !prev)
@@ -48,40 +47,32 @@ export default function Multiselect ({
     }
   }
 
+  // Use the passed `value` prop directly, no internal state
+  const selectedOptions = value
+
   const handleOptions = (event) => {
     const selectedValue = event.target.value
     let updated = []
 
     if (selectedOptions.includes(selectedValue)) {
       updated = selectedOptions.filter(option => option !== selectedValue)
-      console.log('My selected options are:', [updated])
     } else {
       updated = [...selectedOptions, selectedValue]
-      console.log('My selected options are:', [updated])
     }
 
-    setSelectedOptions(updated)
     onChange(updated)
   }
 
   const handleReset = (event) => {
     event.preventDefault()
-    setSelectedOptions([])
-    setOpen(false)
     onChange([])
-    console.log('Multiselect has been reset. Selected options are now:', [])
+    setOpen(false)
   }
 
   return (
     <div className='relative dropdown-container justify-between flex flex-col items-start gap-1 mt-4'>
-      {label && (
-      <label className='block text-primary'>
-        {label}
-      </label>
-      )}
-      <Label>
-        {placeholder && <span className='text-gray-500'>{placeholder}</span>}
-      </Label>
+      {label && <label className='text-primary'>{label}</label>}
+      <Label>{placeholder && <span className='text-gray-500'>{placeholder}</span>}</Label>
 
       <div className={`flex flex-wrap gap-2 ${className}`}>
         <Button
@@ -112,7 +103,10 @@ export default function Multiselect ({
                 <div key={option.value} className='py-1'>
                   <Button
                     type='button'
-                    onClick={handleOptions}
+                    onClick={e => {
+                      e.stopPropagation()
+                      handleOptions(e)
+                    }}
                     value={option.value}
                     disabled={disabled}
                     className={`w-full text-left px-4 py-2 rounded-md border transition ${

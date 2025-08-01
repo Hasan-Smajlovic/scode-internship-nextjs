@@ -9,6 +9,7 @@ export default function Select ({
   onChange,
   placeholder = 'Select an option',
   className = '',
+  error,
   ...rest
 }) {
   return (
@@ -33,20 +34,24 @@ export default function Select ({
           </option>
         ))}
       </select>
+      {error && (
+        <span className='text-red-500 text-xs mt-1'>{error}</span>
+      )}
     </div>
   )
 }
 
 Select.propTypes = {
-  label   : PropTypes.string,
-  options : PropTypes.arrayOf(
+  label       : PropTypes.string,
+  placeholder : PropTypes.string,
+  options     : PropTypes.arrayOf(
     PropTypes.shape({
       value : PropTypes.string.isRequired,
       label : PropTypes.string.isRequired
     })
   ).isRequired,
-  value       : PropTypes.string,
-  onChange    : PropTypes.func,
-  placeholder : PropTypes.string,
-  className   : PropTypes.string
+  value     : PropTypes.string,
+  onChange  : PropTypes.func,
+  className : PropTypes.string,
+  error     : PropTypes.string
 }

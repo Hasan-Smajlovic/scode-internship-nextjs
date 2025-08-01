@@ -26,16 +26,16 @@ export default function Alert ({ type = 'info', children, timeout = 5000, positi
 
   if (!isVisible) return null
 
-  const baseStyles = 'p-4 rounded-md shadow-lg transform transition-all duration-500 flex items-center'
+  const baseStyles = 'text-red-500 text-xs mt-1'
 
   const typeStyles = {
-    primary   : 'bg-primary text-white',
-    secondary : 'bg-secondary text-white',
-    info      : 'bg-blue-100 border border-blue-200 text-info',
-    error     : 'bg-orange-100 border border-red-200 text-error',
-    danger    : 'bg-red-100 border border-red-200 text-danger',
-    warning   : 'bg-yellow-100 border border-yellow-200 text-warning',
-    success   : 'bg-green-100 border border-green-200 text-success'
+    primary   : 'text-primary',
+    secondary : 'text-secondary',
+    info      : 'bg-blue-800 text-white font-bold p-2 rounded text-sm justify-center text-center pl-10 pt-5',
+    error     : 'text-error',
+    danger    : 'bg-red-500 text-white font-bold p-2 rounded text-sm justify-center text-center pl-10 pt-5 z-50',
+    warning   : 'bg-orange text-warning',
+    success   : 'bg-green-500 text-white font-bold p-2 rounded text-sm justify-center text-center pl-10 pt-5 z-50'
   }
 
   const positionStyles = {

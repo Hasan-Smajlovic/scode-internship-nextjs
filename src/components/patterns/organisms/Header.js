@@ -3,7 +3,7 @@ import Link from '../../patterns/atoms/Link'
 
 export default function Header () {
   return (
-    <header className='shadow-md *:tracking-wide z-100 sticky left-0 top-0 text-text'>
+    <header className='shadow-md *:tracking-wide z-50 sticky left-0 top-0 text-text bg-white'>
       <div className='w-full'>
         <div className='container mx-auto flex flex-1 h-[110px] items-center justify-between px-4'>
           <div className='flex items-center space-x-2'>

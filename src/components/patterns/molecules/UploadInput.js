@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import Label from '../atoms/Label'
 import Button from '../atoms/Button'
+
 export default function UploadInput ({
   type = 'file',
   placeholder = 'Upload file',
@@ -12,112 +13,93 @@ export default function UploadInput ({
   accept = 'image/*',
   targetFolder = 'uploads',
   authorName = '',
+  bookTitle = '',
   description,
   error,
+  file = null,
   ...rest
 }) {
   const [fileName, setFileName] = useState('')
   const fileInputRef = useRef(null)
 
+  // Sync file prop with local UI
+  useEffect(() => {
+    if (!file) {
+      setFileName('')
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '' // Clear actual input value
+      }
+    } else if (file.formattedName) {
+      setFileName(file.formattedName)
+    } else if (file.name) {
+      setFileName(file.name)
+    }
+  }, [file])
+
   const handleButtonClick = () => {
-    fileInputRef.current.click()
-  }
-
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0]
-    if (!file) return
-    if (authorName) {
-      // Only allow jpg/jpeg
-      if (!file.type.match(/^image\/jpeg$/)) {
-        alert('Only JPG images are allowed for author photos.')
-        if (onChange) onChange('')
-        return
-      }
-
-      // Check width
-      const img = new window.Image()
-      img.onload = async function () {
-        if (img.width !== 220) {
-          alert('Image width must be exactly 220px for author photos.')
-          if (onChange) onChange('')
-          return
-        }
-        const ext = file.name.split('.').pop()
-        const safeName = authorName.replace(/[^a-z0-9]/gi, '_')
-        const formattedName = `220px-${safeName}.${ext}`
-
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('targetFolder', targetFolder)
-        formData.append('fileName', formattedName)
-
-        try {
-          const res = await fetch('/api/upload', {
-            method : 'POST',
-            body   : formData
-          })
-          const data = await res.json()
-          if (data.success && data.path) {
-            setFileName(formattedName)
-            if (onChange) onChange(data.path)
-          } else {
-            alert('Upload failed: ' + (data.error || 'Unknown error'))
-            if (onChange) onChange('')
-          }
-        } catch (err) {
-          alert('Upload failed: ' + err.message)
-          if (onChange) onChange('')
-        }
-      }
-      img.onerror = function () {
-        alert('Invalid image file.')
-        if (onChange) onChange('')
-      }
-      img.src = URL.createObjectURL(file)
-      return
-    }
-    const formattedName = file.name
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('targetFolder', targetFolder)
-    formData.append('fileName', formattedName)
-
-    try {
-      const res = await fetch('/api/upload', {
-        method : 'POST',
-        body   : formData
-      })
-      const data = await res.json()
-      if (data.success && data.path) {
-        setFileName(formattedName)
-        if (onChange) onChange(data.path)
-      } else {
-        alert('Upload failed: ' + (data.error || 'Unknown error'))
-        if (onChange) onChange('')
-      }
-    } catch (err) {
-      alert('Upload failed: ' + err.message)
-      if (onChange) onChange('')
-    }
+    fileInputRef.current?.click()
   }
 
   const handleFileReset = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+      // Reset input by cloning and replacing it to clear the file input value completely
+      const oldInput = fileInputRef.current
+      if (oldInput.parentNode) {
+        const newInput = oldInput.cloneNode(true)
+        oldInput.parentNode.replaceChild(newInput, oldInput)
+        fileInputRef.current = newInput
+        newInput.addEventListener('change', handleFileChange)
+      } else {
+        oldInput.value = ''
+      }
     }
     setFileName('')
-    if (onReset) onReset()
-    if (onChange) onChange('')
+    onReset?.()
+    onChange?.(null)
+  }
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0]
+    if (!selectedFile) return
+
+    // Validation for author image: only jpg/jpeg allowed
+    if (authorName && !selectedFile.type.match(/^image\/(jpeg|jpg)$/)) {
+      alert('Only JPG images are allowed for author photos.')
+      handleFileReset()
+      return
+    }
+
+    // Validation for book cover: only images allowed
+    if (label === 'Book Cover' && !selectedFile.type.startsWith('image/')) {
+      alert('Only image files are allowed for book covers.')
+      handleFileReset()
+      return
+    }
+
+    const ext = selectedFile.name.split('.').pop()
+    let formattedName = selectedFile.name
+
+    if (authorName) {
+      const safeName = authorName.replace(/[^a-z0-9]/gi, '_')
+      formattedName = `${safeName}.${ext}`
+    } else if (label === 'Book Cover') {
+      const safeTitle = (bookTitle || 'cover').replace(/[^a-z0-9]/gi, '_')
+      formattedName = `${safeTitle}_cover.${ext}`
+    }
+
+    setFileName(formattedName)
+    onChange?.({ file: selectedFile, formattedName })
   }
 
   return (
     <div className={`upload-input mt-3 ${className}`}>
       <Label>
-        {placeholder && <span className='text-primary'>{placeholder}</span>}
+        {label}
+        {description && <small className='block text-gray-500'>{description}</small>}
       </Label>
       <div className='relative mt-2'>
         <div className='mb-2 text-sm text-gray-500'>
-          {fileName ? `Selected: ${fileName} cover` : 'No file chosen'}
+          {fileName ? `Selected: ${fileName}` : 'No file chosen'}
         </div>
         <input
           ref={fileInputRef}
@@ -147,9 +129,7 @@ export default function UploadInput ({
             Reset
           </Button>
         </div>
-        {error && (
-          <div className='text-red-500 text-xs mt-1'>{error}</div>
-        )}
+        {error && <div className='text-red-500 text-xs mt-1'>{error}</div>}
       </div>
     </div>
   )
@@ -165,6 +145,11 @@ UploadInput.propTypes = {
   label        : PropTypes.string,
   targetFolder : PropTypes.string,
   authorName   : PropTypes.string,
+  bookTitle    : PropTypes.string,
   description  : PropTypes.string,
-  error        : PropTypes.string
+  error        : PropTypes.string,
+  file         : PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.oneOf([null])
+  ])
 }
