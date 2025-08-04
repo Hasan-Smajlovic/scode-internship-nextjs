@@ -16,9 +16,10 @@ export default function Input ({
     type,
     placeholder,
     onChange,
-    className: `w-full h-14 ${hasIcon ? 'pl-12' : 'pl-4'} pr-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`,
+    className: className || `w-full h-14 ${hasIcon ? 'pl-12' : 'pl-4'} pr-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`,
     ...rest
   }
+
   if (value !== undefined) {
     inputProps.value = value
   } else if (defaultValue !== undefined) {
@@ -26,7 +27,7 @@ export default function Input ({
   }
 
   return (
-    <div className='w-full relative'>
+    <div className='max-w-full'>
       {type === 'date' && label && (
         <label className='block mb-1 text-sm font-medium text-gray-700'>
           {label}
@@ -49,7 +50,7 @@ Input.propTypes = {
   value        : PropTypes.string,
   defaultValue : PropTypes.string,
   onChange     : PropTypes.func,
-  className    : PropTypes.string,
+  icon         : PropTypes.node,
   label        : PropTypes.string,
-  icon         : PropTypes.element
+  className    : PropTypes.string
 }

@@ -14,12 +14,9 @@ class DBObject {
   }
 
   async getOne (query = {}) {
-    // Query can be a string (ObjectId)
     if (typeof query === 'string') {
       return await this.collection.findOne({ _id: new ObjectId(query) })
     }
-
-    // Query can be an object
     return await this.collection.findOne(query)
   }
 
@@ -53,6 +50,24 @@ class DBObject {
       insertedCount : result.insertedCount,
       insertedIds   : result.insertedIds
     }
+  }
+
+  async search (search = '', options = {}) {
+    let query = {}
+    if (search) {
+      query = {
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { subtitle: { $regex: search, $options: 'i' } },
+          { authors: { $elemMatch: { name: { $regex: search, $options: 'i' } } } },
+          { genre: { $elemMatch: { $regex: search, $options: 'i' } } },
+          { keywords: { $elemMatch: { $regex: search, $options: 'i' } } },
+          { publisher: { $regex: search, $options: 'i' } },
+          { shortDescription: { $regex: search, $options: 'i' } }
+        ]
+      }
+    }
+    return await this.collection.find(query, options).toArray()
   }
 }
 
