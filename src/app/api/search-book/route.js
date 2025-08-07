@@ -1,15 +1,29 @@
 import { NextResponse } from 'next/server'
-import DBObject from '@/data/mongoDb/DBObject'
 
-export async function GET (request) {
+import DBObject from '@/data/mongoDb/DBObject'
+import { DEFAULT_PAGE_SIZE } from '@/constants/collections'
+
+export async function POST (request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search') || ''
+    const body = await request.json()
+    const {
+      searchTerm = '',
+      filters = {},
+      page = 1,
+      pageSize = DEFAULT_PAGE_SIZE,
+      sort = ''
+    } = body
 
     const dbObject = new DBObject('books')
     await dbObject.init()
 
-    const books = await dbObject.search(search)
+    const books = await dbObject.search({
+      searchTerm,
+      filters,
+      page,
+      pageSize,
+      sort
+    })
 
     return NextResponse.json({
       success : true,

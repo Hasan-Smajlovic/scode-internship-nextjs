@@ -1,7 +1,13 @@
+'use client'
+import { useRouter } from 'next/navigation'
+
 import Image from '../../patterns/atoms/Image'
 import Link from '../../patterns/atoms/Link'
+import Search from '../../patterns/molecules/Search'
 
 export default function Header () {
+  const router = useRouter()
+
   return (
     <header className='shadow-md *:tracking-wide z-50 sticky left-0 top-0 text-text bg-white'>
       <div className='w-full'>
@@ -13,6 +19,12 @@ export default function Header () {
           <nav className='flex space-x-6'>
             <Link href='/' className='hover:text-primary-300 transition'>Home</Link>
             <Link href='/custompage' className='hover:text-primary-300 transition'>Custom Page</Link>
+            <div className='mb-6'>
+              <Search
+                onChange={value => router.push(`/searchbook?query=${value}`)}
+                placeholder='Search for books...'
+              />
+            </div>
           </nav>
         </div>
       </div>

@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-
 import Label from '@/components/patterns/atoms/Label'
 
 export default function Select ({
@@ -14,22 +13,19 @@ export default function Select ({
 }) {
   return (
     <div className='flex flex-col gap-2'>
-      {Label && (
+      {label && (
         <Label className='text-sm text-primary mt-1'>
           {label}
         </Label>
       )}
       <select
-        value={value}
-        onChange={onChange}
-        className={`h-18.5 px-4 border  border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        className={`h-18.5 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
         {...rest}
       >
-        <option value='' disabled hidden>
-          {placeholder}
-        </option>
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
+          <option key={opt.value} value={opt.value} disabled={opt.disabled}>
             {opt.label}
           </option>
         ))}
@@ -46,8 +42,9 @@ Select.propTypes = {
   placeholder : PropTypes.string,
   options     : PropTypes.arrayOf(
     PropTypes.shape({
-      value : PropTypes.string.isRequired,
-      label : PropTypes.string.isRequired
+      value    : PropTypes.string.isRequired,
+      label    : PropTypes.string.isRequired,
+      disabled : PropTypes.bool
     })
   ).isRequired,
   value     : PropTypes.string,
