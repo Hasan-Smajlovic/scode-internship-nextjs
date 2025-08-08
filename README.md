@@ -4,9 +4,9 @@ This app is written in Next.js using JavaScript
 
 ### Requisites
 
-- [Git][git] v2.43 or greater
-- [Npm][npm] v10.2 or greater
-- [Node.js][node] 21+ or greater
+- [Git][git] v2.50.1.widnows.1
+- [Npm][npm] v10.9.2
+- [Node.js][node] 22.17.1
 
 ## Project Setup
 

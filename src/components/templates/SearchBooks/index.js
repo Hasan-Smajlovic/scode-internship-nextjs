@@ -8,7 +8,7 @@ import Sort from './Sort'
 import Items from './Items'
 import Pagging from './Pagging'
 
-export default function SearchBooks ({ items, totalCount }) {
+export default function SearchBooks ({ items: initialItems, totalCount: initialTotalCount }) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const query = searchParams.get('query') || ''
@@ -20,7 +20,10 @@ export default function SearchBooks ({ items, totalCount }) {
   const publishedYear = searchParams.get('publishedYear')
   const author = searchParams.get('author')
 
-  const [filteredItems, setFilteredItems] = useState(items)
+  const [items, setItems] = useState(initialItems)
+  const [totalCount, setTotalCount] = useState(initialTotalCount)
+
+  const [filteredItems, setFilteredItems] = useState(initialItems)
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'))
   const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('pageSize') || '10'))
 
@@ -35,7 +38,7 @@ export default function SearchBooks ({ items, totalCount }) {
         params.delete(key)
       }
     })
-    router.push(`/searchbook?${params.toString()}`)
+    router.push(`/searchbook?${params.toString()}`) // samo za header
   }
 
   const handlePageChange = (page) => {
@@ -54,6 +57,49 @@ export default function SearchBooks ({ items, totalCount }) {
       page     : newCurrentPage
     })
   }
+
+  useEffect(() => {
+    const paramsObject = {}
+    searchParams.forEach((value, key) => {
+      paramsObject[key] = value
+    })
+
+    if (query) {
+      fetch('/api/search-book', {
+        method  : 'POST',
+        headers : {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          searchTerm : query,
+          filters    : {
+            format,
+            genre,
+            pageCount,
+            newRelease: newRelease === 'true',
+            publisher,
+            publishedYear,
+            author
+          },
+          page     : currentPage,
+          pageSize : itemsPerPage,
+          sort     : searchParams.get('sort') || 'title ASC'
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('API response:', data)
+          if (data && data.items) {
+            setItems(data.items)
+            setTotalCount(data.totalCount || data.items.length)
+            setFilteredItems(data.items)
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching search results:', error)
+        })
+    }
+  }, [author, publishedYear, genre, newRelease, publisher, itemsPerPage, currentPage, format, pageCount, query, searchParams])
 
   useEffect(() => {
     setFilteredItems(items)
@@ -139,7 +185,8 @@ export default function SearchBooks ({ items, totalCount }) {
             />
           </div>
         </div>
-        <Items items={items} />
+
+        <Items items={filteredItems} />
       </main>
     </div>
   )

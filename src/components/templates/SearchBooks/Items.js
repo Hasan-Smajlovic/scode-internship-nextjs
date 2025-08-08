@@ -9,7 +9,7 @@ export default function Items ({ items }) {
     <ul className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6'>
       {items.map(book => (
         <li
-          key={book._id}
+          key={book.id}
           className='flex flex-col mr-7 mb-10 bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden'
         >
           {book.cover && (
@@ -62,7 +62,7 @@ export default function Items ({ items }) {
 Items.propTypes = {
   items: PropTypes.arrayOf(
     PropTypes.shape({
-      _id              : PropTypes.string.isRequired,
+      id               : PropTypes.string.isRequired,
       title            : PropTypes.string.isRequired,
       cover            : PropTypes.string,
       shortDescription : PropTypes.string,

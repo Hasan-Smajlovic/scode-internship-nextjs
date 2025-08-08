@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
-
-export default function RangeSlider ({ min, max, value, onChange }) {
+export default function RangeSlider ({ min, max, onChange, value = ' ', step }) {
   return (
     <div className='flex flex-col gap-4 p-4 bg-white shadow-md rounded-lg pt-10'>
       <input
@@ -8,19 +7,19 @@ export default function RangeSlider ({ min, max, value, onChange }) {
         min={min}
         max={max}
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className='w-full'
+        step={step}
+        className='max-w-md'
+        onChange={e => onChange(Number(e.target.value))}
       />
-      <div className='flex justify-between'>
-        <span>{min}</span>
-        <span>{max}</span>
-      </div>
+      <div>Page: {value}</div>
     </div>
   )
 }
+
 RangeSlider.propTypes = {
   min      : PropTypes.number.isRequired,
   max      : PropTypes.number.isRequired,
+  onChange : PropTypes.func.isRequired,
   value    : PropTypes.number.isRequired,
-  onChange : PropTypes.func.isRequired
+  step     : PropTypes.number
 }

@@ -8,10 +8,9 @@ export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPage
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) return
+    if (page < 1 || page > totalPages) { return }
     onPageChange(page)
   }
-
   const getPageNumbers = () => {
     const pages = []
     const maxPagesToShow = 5
@@ -71,11 +70,8 @@ export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPage
             Previous
           </Button>
           {getPageNumbers().map((item, idx) =>
-            item.type === 'ellipsis'
+            item.type === 'page'
               ? (
-                <span key={`ellipsis-${idx}`} className='px-3 py-2'>...</span>
-                )
-              : (
                 <Button
                   key={`page-${item.value}`}
                   type='button'
@@ -85,7 +81,11 @@ export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPage
                 >
                   {item.value}
                 </Button>
-                ))}
+                )
+              : (
+                <span key={`ellipsis-${idx}`} className='px-3 py-2'>...</span>
+                )
+          )}
           <Button
             type='button'
             variant='primary'

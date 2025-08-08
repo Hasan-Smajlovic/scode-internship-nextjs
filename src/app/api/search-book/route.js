@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { DEFAULT_PAGE_SIZE } from '@/constants/paging'
 import DBObject from '@/data/mongoDb/DBObject'
-import { DEFAULT_PAGE_SIZE } from '@/constants/collections'
 
 export async function POST (request) {
   try {
@@ -14,24 +14,30 @@ export async function POST (request) {
       sort = ''
     } = body
 
+    const parsedPage = parseInt(page, 10) || 1
+    const parsedPageSize = parseInt(pageSize, 10) || DEFAULT_PAGE_SIZE
+
     const dbObject = new DBObject('books')
     await dbObject.init()
 
-    const books = await dbObject.search({
+    const result = await dbObject.searchWithFacets({
       searchTerm,
       filters,
-      page,
-      pageSize,
+      page     : parsedPage,
+      pageSize : parsedPageSize,
       sort
     })
 
     return NextResponse.json({
-      success : true,
-      count   : books.length,
-      status  : 200,
-      books
+      success       : true,
+      status        : 200,
+      items         : result.items,
+      totalCount    : result.totalCount,
+      facets        : result.facets,
+      searchRequest : result.searchRequest
     })
   } catch (error) {
+    console.error('Search API error:', error)
     return NextResponse.json({
       success : false,
       message : 'Error fetching books',

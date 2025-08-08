@@ -6,16 +6,17 @@ import RangeSlider from '@/components/patterns/atoms/RangeSlider'
 import Button from '@/components/patterns/atoms/Button'
 
 export default function Filter ({
-  format = '', onFormatChange = () => {},
-  genre = '', onGenreChange = () => {},
-  pageCount = [0, 1000], onPageCountChange = () => {},
-  onClear = () => {}
+  format = '', onFormatChange = () => {
+  },
+  genre = '', onGenreChange = () => {
+  },
+  pageCount = [0, 100], onPageCountChange = () => {
+  }
 }) {
-  const handleResetFilters = () => {
+  const handleFilterReset = () => {
     onFormatChange('')
     onGenreChange('')
-    onPageCountChange([0, 1000])
-    onClear()
+    onPageCountChange([0, 100])
   }
 
   return (
@@ -36,7 +37,6 @@ export default function Filter ({
             onChange={e => onFormatChange(e.target ? e.target.value : e)}
           />
         </div>
-
         <div>
           <Label className='block mb-1 text-sm font-medium text-gray-700'>Genre</Label>
           <Select
@@ -55,12 +55,13 @@ export default function Filter ({
         </div>
 
         <div>
-          <Label className='block mb-1 text-sm font-medium text-gray-700'>Page Count</Label>
+          <label className='block mb-1 text-sm font-medium text-gray-700'>Page Count</label>
           <RangeSlider
             min={0}
-            max={1000}
+            max={100}
+            step={1}
             value={pageCount}
-            onChange={value => onPageCountChange(value)}
+            onChange={onPageCountChange}
           />
         </div>
       </div>
@@ -70,7 +71,9 @@ export default function Filter ({
           type='button'
           variant='primary'
           className='px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200'
-          onClick={handleResetFilters}
+          onClick={() => {
+            handleFilterReset()
+          }}
         >
           Clear Filters
         </Button>
@@ -85,6 +88,5 @@ Filter.propTypes = {
   genre             : PropTypes.string,
   onGenreChange     : PropTypes.func,
   pageCount         : PropTypes.array,
-  onPageCountChange : PropTypes.func,
-  onClear           : PropTypes.func
+  onPageCountChange : PropTypes.func
 }

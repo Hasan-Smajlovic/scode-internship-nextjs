@@ -114,7 +114,7 @@ class DBObject {
     const [result] = await this.collection.aggregate(aggregation).toArray()
     return {
       searchRequest : searchObject,
-      items         : result.items,
+      items         : result.items.map(({ _id, ...rest }) => ({ ...rest, id: _id.toString() })),
       totalCount    : result.totalCount[0]?.count || 0,
       facets        : {
         formats : result.formats,
