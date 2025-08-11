@@ -4,13 +4,22 @@ import PropTypes from 'prop-types'
 import { PAGING_OPTIONS } from '@/constants/paging'
 import Button from '@/components/patterns/atoms/Button'
 
-export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPageChange, onItemsPerPageChange }) {
-  const totalPages = Math.ceil(totalItems / itemsPerPage)
+export default function Pagging ({
+  currentPage,
+  totalItems,
+  itemsPerPage,
+  onPageChange,
+  onItemsPerPageChange
+}) {
+  const totalPages = Math.ceil(totalItems / itemsPerPage) // used total items instead of .length to switch between paginated and non-paginated views
 
   const handlePageChange = (page) => {
-    if (page < 1 || page > totalPages) { return }
-    onPageChange(page)
+    const validPage = Math.max(1, Math.min(page, totalPages))
+    if (validPage !== currentPage) {
+      onPageChange(validPage)
+    }
   }
+
   const getPageNumbers = () => {
     const pages = []
     const maxPagesToShow = 5
@@ -27,6 +36,10 @@ export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPage
       for (let i = start; i <= end; i++) {
         pages.push({ type: 'page', value: i })
       }
+      if (end < totalPages - 1) {
+        pages.push({ type: 'page' })
+      }
+      pages.push({ type: 'page', value: totalPages })
     }
     return pages
   }
@@ -41,14 +54,11 @@ export default function Pagging ({ currentPage, totalItems, itemsPerPage, onPage
         </div>
       </div>
       <div className='flex justify-center mb-4 mt-6'>
-        <label htmlFor='itemsPerPage' className='mr-2 text-sm text-gray-600 mt-1'>
-          Items per page:
-        </label>
         <select
           id='itemsPerPage'
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className='border border-gray-300 rounded px-2 py-1 text-sm'
+          className='bg-primary text-white border-primary rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-30 min-h-10 pl-2 pr-2'
         >
           {PAGING_OPTIONS.map(option => (
             <option key={option.value} value={option.value}>

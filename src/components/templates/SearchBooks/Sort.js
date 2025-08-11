@@ -1,17 +1,21 @@
 import PropTypes from 'prop-types'
 
-import Select from '@/components/patterns/atoms/Select'
-import Label from '@/components/patterns/atoms/Label'
-
 export default function Sort ({ value, onChange, options = [] }) {
   return (
-    <div className='mt-5 relative left-0 md:left-0 w-full md:w-30 md: mb-5 flex flex-col p-2 gap-2 bg-white shadow-lg rounded-xl border border-gray-100'>
-      <Label className='text-lg font-semibold'>Sort</Label>
-      <Select
-        options={options}
-        value={value}
-        onChange={onChange}
-      />
+    <div className='flex flex-col gap-2'>
+      <div className='transition-all bg-primary bg-gray-200 mt-5'>
+        <select
+          value={value}
+          onChange={onChange}
+          className='px-4 justify-center py-2 rounded bg-primary max-w-31 text-white duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white cursor-pointer transition-all'
+        >
+          {options.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   )
 }

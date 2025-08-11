@@ -53,13 +53,16 @@ class DBObject {
   }
 
   async searchWithFacets (searchObject = {}) {
-    const {
+    let {
       searchTerm = '',
       filters = {},
       page = 1,
       pageSize = 9,
       sort = 'title ASC'
     } = searchObject
+
+    page = Number(page) || 1
+    pageSize = Number(pageSize) || 9
 
     const query = {}
     if (searchTerm) {
@@ -73,6 +76,7 @@ class DBObject {
         { shortDescription: { $regex: searchTerm, $options: 'i' } }
       ]
     }
+    if (filters.publishedYear) query.publishedDate = { $regex: `^${filters.publishedYear}` }
     if (filters.format) query.format = filters.format
     if (filters.genre) query.genre = filters.genre
 
