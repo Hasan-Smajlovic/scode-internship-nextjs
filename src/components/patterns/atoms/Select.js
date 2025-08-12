@@ -21,7 +21,7 @@ export default function Select ({
       <select
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-18.5 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring ${className}`}
+        className={`h-18.5 px-4 border border-gray-300 rounded-md focus:outline-none focus:ring text-sm ${className}`}
         {...rest}
       >
         {options.map((opt) => (

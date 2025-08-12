@@ -1,5 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
+import { useRef } from 'react'
 
 import Image from '../../patterns/atoms/Image'
 import Link from '../../patterns/atoms/Link'
@@ -7,6 +8,14 @@ import Search from '../../patterns/molecules/Search'
 
 export default function Header () {
   const router = useRouter()
+  const timeoutRef = useRef(null)
+
+  const handleSearchChange = value => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => {
+      router.push(`/searchbook?query=${value}`)
+    }, 500)
+  }
 
   return (
     <header className='shadow-md *:tracking-wide z-50 sticky left-0 top-0 text-text bg-white'>
@@ -21,7 +30,7 @@ export default function Header () {
             <Link href='/custompage' className='hover:text-primary-300 transition'>Custom Page</Link>
             <div className='mb-6'>
               <Search
-                onChange={value => router.push(`/searchbook?query=${value}`)}
+                onChange={handleSearchChange}
                 placeholder='Search for books...'
               />
             </div>

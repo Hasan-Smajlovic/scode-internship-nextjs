@@ -76,9 +76,23 @@ class DBObject {
         { shortDescription: { $regex: searchTerm, $options: 'i' } }
       ]
     }
-    if (filters.publishedYear) query.publishedDate = { $regex: `^${filters.publishedYear}` }
-    if (filters.format) query.format = filters.format
-    if (filters.genre) query.genre = filters.genre
+    if (filters.publishedYear) query.publishedDate = { $regex: `^${filters.publishedYear}` } // validation for published year
+    if (filters.publishedYear && filters.publishedYear !== 'all') {
+      query.publishedDate = { $regex: `^${filters.publishedYear}` } // here all years will be handled
+    }
+    if (filters.format) query.format = filters.format // filtering for format
+    if (filters.genre) query.genre = filters.genre // filtering for genre
+    if (filters.newRelease) query.newRelease = filters.newRelease // filtering for new releases
+    if (filters.keywords) {
+      if (Array.isArray(filters.keywords)) {
+        query.keywords = { $all: filters.keywords }
+      } else if (typeof filters.keywords === 'string') {
+        const keywordsList = filters.keywords.split(',').map(k => k.trim()).filter(Boolean)
+        if (keywordsList.length > 0) {
+          query.keywords = { $all: keywordsList }
+        }
+      }
+    }
 
     const [sortField, sortOrder] = sort.split(' ')
     const sortQuery = { [sortField]: sortOrder.toLowerCase() === 'asc' ? 1 : -1 }
@@ -110,6 +124,11 @@ class DBObject {
             { $unwind: '$authors' },
             { $group: { _id: '$authors.name', count: { $sum: 1 } } },
             { $project: { value: '$_id', count: 1, _id: 0 } }
+          ],
+          keywords: [
+            { $unwind: '$keywords' },
+            { $group: { _id: '$keywords', count: { $sum: 1 } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } }
           ]
         }
       }
@@ -121,9 +140,10 @@ class DBObject {
       items         : result.items.map(({ _id, ...rest }) => ({ ...rest, id: _id.toString() })),
       totalCount    : result.totalCount[0]?.count || 0,
       facets        : {
-        formats : result.formats,
-        genres  : result.genres,
-        authors : result.authors
+        formats  : result.formats,
+        genres   : result.genres,
+        authors  : result.authors,
+        keywords : result.keywords
       }
     }
   }

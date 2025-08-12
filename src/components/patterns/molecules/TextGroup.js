@@ -35,7 +35,10 @@ export default function TextGroup ({
     const newText = [...text]
     newText.splice(index, 1)
     setText(newText)
-    onChange(newText)
+    // Create a mock event object with a value property
+    if (typeof onChange === 'function') {
+      onChange({ target: { value: newText } })
+    }
   }
 
   const handleMovingDown = (event) => {
@@ -43,7 +46,10 @@ export default function TextGroup ({
       const newInputField = [...text, inputField.trim()]
       setText(newInputField)
       setInputField('')
-      onChange(newInputField)
+      // Create a mock event object with a value property
+      if (typeof onChange === 'function') {
+        onChange({ target: { value: newInputField } })
+      }
     }
   }
 

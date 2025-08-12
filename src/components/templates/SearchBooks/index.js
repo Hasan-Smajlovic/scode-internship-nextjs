@@ -1,5 +1,5 @@
 'use client'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
@@ -7,78 +7,78 @@ import Filter from '@/components/templates/SearchBooks/Filter'
 import Sort from './Sort'
 import Items from './Items'
 import Pagging from './Pagging'
+
 export default function SearchBooks ({ items: initialItems, totalCount: initialTotalCount }) {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const pathname = usePathname()
 
-  const query = searchParams.get('query') || ''
+  // Filters searchparams
   const format = searchParams.get('format')
   const genre = searchParams.get('genre')
-  const pageCount = searchParams.get('pageCount')
   const newRelease = searchParams.get('newRelease')
-  const publisher = searchParams.get('publisher')
   const publishedYear = searchParams.get('publishedYear') // i added this so my filtering by year works
-  const author = searchParams.get('author')
+  const keywords = searchParams.get('keywords') // i added this so my filtering by keywords works
+  // Query searchparams
+  const query = searchParams.get('query') || ''
+  // Pagination searchparams
+  const pageCount = searchParams.get('pageCount')
+  const currentPage = parseInt(searchParams.get('page') || '1', 10)
+  const itemsPerPage = parseInt(searchParams.get('pageSize') || '10', 10)
+  // Sort searchparams
+  const sort = searchParams.get('sort') || 'title ASC'
 
+  // States for items, totalCount, facets
   const [items, setItems] = useState(initialItems)
   const [totalCount, setTotalCount] = useState(initialTotalCount)
   const [facets, setFacets] = useState(initialItems.facets || {}) // This is where i made a state for facets for filtering
 
+  // Filtered items
   const [filteredItems, setFilteredItems] = useState(initialItems)
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'))
-  const [itemsPerPage, setItemsPerPage] = useState(parseInt(searchParams.get('pageSize') || '10'))
 
   const totalPages = Math.ceil(totalCount / itemsPerPage)
 
   const updateFilters = (newParams) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(Array.from(searchParams.entries()))
     Object.entries(newParams).forEach(([key, value]) => {
-      if (value && value !== '' && value.length !== 0) {
+      if (value !== undefined && value !== '' && value !== null && !(Array.isArray(value) && value.length === 0)) {
         params.set(key, value)
       } else {
         params.delete(key)
       }
     })
-    if (pathname === '/searchbook') {
-      router.push(`/searchbook?${params.toString()}`) // samo za header
-    }
+    window.history.replaceState({}, '', `${pathname}?${params.toString()}`)
   }
 
   const handlePageChange = (page) => {
     const validPage = Math.max(1, Math.min(page, totalPages))
-    setCurrentPage(validPage)
     updateFilters({ page: validPage })
   }
 
-  const handleItemsPerPageChange = (newItemsPerPage) => {
-    const newTotalPages = Math.ceil(filteredItems.length / newItemsPerPage)
-    const newCurrentPage = Math.min(currentPage, newTotalPages || 1)
-    setItemsPerPage(newItemsPerPage)
-    setCurrentPage(newCurrentPage)
+  const handleItemsPerPageChange = (newItemsPerPage) => { // handle setting items per change (how many it will show)
     updateFilters({
       pageSize : newItemsPerPage,
-      page     : newCurrentPage
+      page     : 1
     })
   }
 
-  const handleClick = (event) => {
-    const { value } = event.target
-    router.push(`/searchbook?query=${value} ` + 11)
-    console.log('Search term clicked:')
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1)
+    }
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1)
+    }
   }
 
   const handleSortChange = (newSort) => {
-    updateFilters({ sort: newSort, page: 1 }) // Page will reset to page 1 on sort change
-    console.log('My sorted data:', newSort)
+    updateFilters({ sort: newSort, page: 1 }) // My page will reset to page 1 on sort change
   }
 
+  // Use effect to fetch search results with POST
   useEffect(() => {
-    const paramsObject = {}
-    searchParams.forEach((value, key) => {
-      paramsObject[key] = value
-    })
-
     if (query) {
       fetch('/api/search-book', {
         method  : 'POST',
@@ -92,18 +92,15 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
             genre,
             pageCount,
             newRelease: newRelease === 'true',
-            publisher,
-            publishedYear,
-            author
+            publishedYear
           },
           page     : currentPage,
           pageSize : itemsPerPage,
-          sort     : searchParams.get('sort') || 'title ASC'
+          sort
         })
       })
         .then(response => response.json())
         .then(data => {
-          console.log('API response', data)
           if (data && data.items) {
             setItems(data.items)
             setTotalCount(data.totalCount || data.items.length)
@@ -115,33 +112,28 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
           console.error('Error fetching search results:', error)
         })
     }
-  }, [author, publishedYear, genre, newRelease, publisher, itemsPerPage, currentPage, format, pageCount, query, searchParams])
+  }, [publishedYear, genre, newRelease, itemsPerPage, currentPage, format, pageCount, query, sort, keywords])
 
+  // Update filtered items when facets change
   useEffect(() => {
     setFilteredItems(items)
   }, [items])
 
+  // if nothing is searched
   if (!query) {
     return (
       <div className='flex flex-col md:flex-row gap-6 p-4'>
         <aside className='w-full md:w-1/3 lg:w-1/4'>
           <div className='w-full h-full p-4 flex flex-col gap-4 bg-white rounded-lg border-r border-b border-gray-200'>
             <Filter
-              facets={facets} // called facets
+              facets={facets}
               format={format}
-              onFormatChange={(value) => updateFilters({ format: value })}
+              updateFilters={updateFilters}
               genre={genre}
-              onGenreChange={(value) => updateFilters({ genre: value })}
               pageCount={pageCount ? pageCount.split(',').map(Number) : [0, 1000]}
-              onPageCountChange={value => updateFilters({ pageCount: value })}
               newRelease={newRelease === 'true'}
-              onNewReleaseChange={(value) => updateFilters({ newRelease: value })}
-              publisher={publisher}
-              onPublisherChange={(value) => updateFilters({ publisher: value })}
               publishedYear={publishedYear}
-              onPublishedYearChange={(value) => updateFilters({ publishedYear: value })}
-              author={author}
-              onAuthorChange={(value) => updateFilters({ author: value })}
+              keywords={keywords}
             />
           </div>
         </aside>
@@ -155,32 +147,23 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
     )
   }
 
+  // if something is searched
   return (
     <div className='flex flex-col md:flex-row gap-6 p-4'>
       <aside className='w-full md:w-1/3 lg:w-1/4 mb-6 md:mb-0'>
         <div className='w-full h-full p-4 flex flex-col gap-4 bg-white rounded-lg border-r border-b border-gray-200'>
           <Filter
-            facets={facets} // added facets here
-            year={publishedYear}
-            onYearChange={(value) => updateFilters({ publishedYear: value })}
+            facets={facets}
             format={format}
-            onFormatChange={(value) => updateFilters({ format: value })}
+            updateFilters={updateFilters}
             genre={genre}
-            onGenreChange={(value) => updateFilters({ genre: value })}
             pageCount={pageCount ? pageCount.split(',').map(Number) : [0, 1000]}
-            onPageCountChange={value => updateFilters({ pageCount: value })}
-            newRelease={newRelease === 'true'} // still does not work
-            onNewReleaseChange={(value) => updateFilters({ newRelease: value })}
-            publisher={publisher}
-            onPublisherChange={(value) => updateFilters({ publisher: value })}
+            newRelease={newRelease === 'true'}
             publishedYear={publishedYear}
-            onPublishedYearChange={(value) => updateFilters({ publishedYear: value })}
-            author={author}
-            onAuthorChange={(value) => updateFilters({ author: value })}
+            keywords={keywords}
           />
         </div>
       </aside>
-
       <main className='w-full md:w-2/3 lg:w-3/4 flex flex-col gap-4'>
         <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4'>
           <Sort
@@ -197,18 +180,17 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
               { value: 'publishedYear DESC', label: 'Published Year' }
             ]}
           />
-          <div className='flex flex-col md:flex-row md:items-center md:gap-6 gap-2'>
-            <Pagging
-              currentPage={currentPage}
-              totalItems={totalCount}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              onClick={handleClick}
-            />
-          </div>
+          <Pagging
+            currentPage={currentPage}
+            totalItems={totalCount}
+            itemsPerPage={itemsPerPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
         </div>
-
         <Items items={filteredItems} />
       </main>
     </div>

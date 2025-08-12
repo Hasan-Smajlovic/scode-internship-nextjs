@@ -58,7 +58,7 @@ export default function Pagging ({
           id='itemsPerPage'
           value={itemsPerPage}
           onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-          className='bg-primary text-white border-primary rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-30 min-h-10 pl-2 pr-2'
+          className='bg-primary text-white border-primary rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 max-w-30 min-h-10 pl-2 pr-2 cursor-pointer'
         >
           {PAGING_OPTIONS.map(option => (
             <option key={option.value} value={option.value}>
