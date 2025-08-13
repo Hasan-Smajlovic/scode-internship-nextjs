@@ -2,7 +2,11 @@ import PropTypes from 'prop-types'
 
 export default function Items ({ items }) {
   if (!items || items.length === 0) {
-    return <p className='relative left-145 text-gray-500'>No books found.</p>
+    return (
+      <p className='text-center text-gray-500 py-8'>
+        No books found.
+      </p>
+    )
   }
 
   return (

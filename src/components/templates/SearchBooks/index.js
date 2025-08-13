@@ -18,6 +18,7 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
   const newRelease = searchParams.get('newRelease')
   const publishedYear = searchParams.get('publishedYear') // i added this so my filtering by year works
   const keywords = searchParams.get('keywords') // i added this so my filtering by keywords works
+  const yearRange = searchParams.get('yearRange') // i added this so my filtering by year range works
   // Query searchparams
   const query = searchParams.get('query') || ''
   // Pagination searchparams
@@ -92,7 +93,9 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
             genre,
             pageCount,
             newRelease: newRelease === 'true',
-            publishedYear
+            publishedYear,
+            keywords,
+            yearRange
           },
           page     : currentPage,
           pageSize : itemsPerPage,
@@ -112,7 +115,7 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
           console.error('Error fetching search results:', error)
         })
     }
-  }, [publishedYear, genre, newRelease, itemsPerPage, currentPage, format, pageCount, query, sort, keywords])
+  }, [publishedYear, genre, newRelease, itemsPerPage, currentPage, format, pageCount, query, sort, keywords, yearRange])
 
   // Update filtered items when facets change
   useEffect(() => {
@@ -134,6 +137,7 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
               newRelease={newRelease === 'true'}
               publishedYear={publishedYear}
               keywords={keywords}
+              yearRange={yearRange}
             />
           </div>
         </aside>

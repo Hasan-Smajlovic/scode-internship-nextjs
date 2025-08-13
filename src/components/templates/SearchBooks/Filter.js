@@ -5,29 +5,31 @@ import Select from '@/components/patterns/atoms/Select'
 import Button from '@/components/patterns/atoms/Button'
 import Checkbox from '@/components/patterns/atoms/Checkbox'
 import TextGroup from '@/components/patterns/molecules/TextGroup'
-import RangeSlider from '@/components/patterns/atoms/RangeSlider'
+import YearInput from '@/components/templates/SearchBooks/YearInput'
 
 export default function Filter ({
   facets = {},
+  updateFilters,
   format = '',
   genre = '',
   publishedYear = '',
   newRelease = false,
   keywords = '',
-  updateFilters
+  yearRange = ['', '']
 }) {
-  // add more facets => Date range
   const handleFilterReset = () => {
     updateFilters({
       format        : '',
       genre         : '',
       publishedYear : '',
-      newRelease    : false,
-      keywords      : ''
+      newRelease    : '',
+      keywords      : '',
+      yearRange     : null
     })
   }
 
-  const formatCounts = (facets.formats || []).reduce((acc, cur) => { // if missing value or count is 0, set to 0 (validating facets)
+  // for numbering
+  const formatCounts = (facets.formats || []).reduce((acc, cur) => {
     acc[cur.value] = cur.count || 0
     return acc
   }, {})
@@ -126,28 +128,33 @@ export default function Filter ({
                 updateFilters({ publishedYear: e.target ? e.target.value : e })
               }}
             />
-            <div className='mt-7'>
-              <TextGroup
-                label='Keywords'
-                value={keywords}
-                className='h-18 w-full px-4 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring md:w-94.5'
-                onChange={e => updateFilters({ keywords: e.target.value })}
-              />
-            </div>
-            <div className='mt-7'>
-              <RangeSlider
-                min={0}
-                max={100}
-                step={1}
-                onChange={value => updateFilters({ rating: value })}
-              />
-            </div>
           </div>
+
+          <div className='mt-7 text-sm text-gray-900'>
+            <TextGroup
+              label='Keywords'
+              value={keywords}
+              className='h-18.5 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
+              onChange={e => updateFilters({ keywords: e.target ? e.target.value : e })}
+            />
+          </div>
+
+          <YearInput
+            minYear={1900}
+            maxYear={2025}
+            value={yearRange}
+            onChange={(newYearRange) => {
+              setTimeout(() => {
+                updateFilters({ yearRange: newYearRange })
+              }, 1000)
+            }}
+          />
+
           <div className='mt-5'>
             <Checkbox
               label={<span>Show only new releases</span>}
               checked={!!newRelease}
-              onChange={e => updateFilters({ newRelease: e.target.checked })}
+              onChange={e => updateFilters({ newRelease: e.target.checked ? true : '' })}
             />
           </div>
         </div>
@@ -173,5 +180,6 @@ Filter.propTypes = {
   publishedYear : PropTypes.string,
   newRelease    : PropTypes.bool,
   updateFilters : PropTypes.func,
-  keywords      : PropTypes.string
+  keywords      : PropTypes.string,
+  yearRange     : PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string]))
 }

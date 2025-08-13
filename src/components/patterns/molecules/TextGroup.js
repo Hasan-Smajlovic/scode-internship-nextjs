@@ -10,16 +10,15 @@ import Alert from '../atoms/Alert'
 export default function TextGroup ({
   placeholder = 'Insert new value',
   onChange = () => {},
-  className = 'w-50%, border border-gray-300 rounded-md p-2',
+  className = 'h-18 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm',
   label = 'Text Group',
   icon = null,
   error,
-  value = [] // Controlled value from parent
+  value = []
 }) {
   const [inputField, setInputField] = useState('')
   const [text, setText] = useState([])
 
-  // Sync internal state when value prop changes
   useEffect(() => {
     if (Array.isArray(value)) {
       setText(value)
@@ -35,7 +34,6 @@ export default function TextGroup ({
     const newText = [...text]
     newText.splice(index, 1)
     setText(newText)
-    // Create a mock event object with a value property
     if (typeof onChange === 'function') {
       onChange({ target: { value: newText } })
     }
@@ -46,7 +44,6 @@ export default function TextGroup ({
       const newInputField = [...text, inputField.trim()]
       setText(newInputField)
       setInputField('')
-      // Create a mock event object with a value property
       if (typeof onChange === 'function') {
         onChange({ target: { value: newInputField } })
       }
@@ -58,32 +55,35 @@ export default function TextGroup ({
   }
 
   return (
-    <div className='justify-between flex flex-col items-start w-full'>
-      <div className={`flex flex-wrap w-full${text.length > 0 ? ' gap-2 mb-2' : ''}`}>
-        {text.map((item, index) => (
-          <Chip key={index} label={item} onClose={() => handleRemoveItem(index)} />
-        ))}
+    <div className='mt-5 text-sm text-gray-900'>
+      <Label className='block mb-1 text-sm font-medium'>{label}</Label>
+      <div className='flex flex-col w-full'>
+        <div className={`flex flex-wrap w-full${text.length > 0 ? ' gap-2 mb-2' : ''}`}>
+          {text.map((item, index) => (
+            <Chip key={index} label={item} onClose={() => handleRemoveItem(index)} />
+          ))}
+        </div>
+        <Input
+          type='text'
+          icon={icon}
+          name='text-group'
+          placeholder={placeholder}
+          value={inputField}
+          onChange={handleChange}
+          onKeyDown={handleMovingDown}
+          className={className}
+        />
+        {error && (
+          <Alert
+            type='error'
+            position='inline'
+            timeout={0}
+            className='mt-1'
+          >
+            {error || `${label} is required`}
+          </Alert>
+        )}
       </div>
-      <Label>{label && <span className='text-primary'>{label}</span>}</Label>
-      <Input
-        type='text'
-        icon={icon}
-        name='text-group'
-        placeholder={placeholder}
-        value={inputField}
-        onChange={handleChange}
-        onKeyDown={handleMovingDown}
-        className={className}
-      />
-      {error && (
-        <Alert
-          type='error'
-          position='inline'
-          timeout={0}
-        >
-          {error || `${label} is required`}
-        </Alert>
-      )}
     </div>
   )
 }

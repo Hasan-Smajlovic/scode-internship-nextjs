@@ -7,7 +7,7 @@ export default function Sort ({ value, onChange, options = [] }) {
         <select
           value={value}
           onChange={onChange}
-          className='px-4 justify-center py-2 rounded bg-primary max-w-31 text-white duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white cursor-pointer transition-all'
+          className='px-4 justify-center py-2 rounded-medium bg-primary max-w-31 text-white duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white cursor-pointer transition-all'
         >
           {options.map(option => (
             <option key={option.value} value={option.value}>

@@ -93,6 +93,9 @@ class DBObject {
         }
       }
     }
+    if (filters.yearRange) {
+      query.yearRange = { $elemMatch: { $gte: filters.yearRange[0], $lte: filters.yearRange[1] } }
+    }
 
     const [sortField, sortOrder] = sort.split(' ')
     const sortQuery = { [sortField]: sortOrder.toLowerCase() === 'asc' ? 1 : -1 }
@@ -140,10 +143,11 @@ class DBObject {
       items         : result.items.map(({ _id, ...rest }) => ({ ...rest, id: _id.toString() })),
       totalCount    : result.totalCount[0]?.count || 0,
       facets        : {
-        formats  : result.formats,
-        genres   : result.genres,
-        authors  : result.authors,
-        keywords : result.keywords
+        formats   : result.formats,
+        genres    : result.genres,
+        authors   : result.authors,
+        keywords  : result.keywords,
+        yearRange : result.yearRange
       }
     }
   }
