@@ -18,7 +18,12 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
   const newRelease = searchParams.get('newRelease')
   const publishedYear = searchParams.get('publishedYear') // i added this so my filtering by year works
   const keywords = searchParams.get('keywords') // i added this so my filtering by keywords works
-  const yearRange = searchParams.get('yearRange') // i added this so my filtering by year range works
+  const yearFrom = searchParams.get('yearFrom') || '' // i added this so my filtering by year range works
+  const yearTo = searchParams.get('yearTo') || '' // i added this so my filtering by year range works
+
+  // formati, genre promijeniti
+  // keywords da su kao filteri, dodati sort na keywords
+
   // Query searchparams
   const query = searchParams.get('query') || ''
   // Pagination searchparams
@@ -39,6 +44,9 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
   const totalPages = Math.ceil(totalCount / itemsPerPage)
 
   const updateFilters = (newParams) => {
+    // {
+    //   yearFrom: '2024-08-19'
+    // }
     const params = new URLSearchParams(Array.from(searchParams.entries()))
     Object.entries(newParams).forEach(([key, value]) => {
       if (value !== undefined && value !== '' && value !== null && !(Array.isArray(value) && value.length === 0)) {
@@ -95,7 +103,8 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
             newRelease: newRelease === 'true',
             publishedYear,
             keywords,
-            yearRange
+            yearFrom,
+            yearTo
           },
           page     : currentPage,
           pageSize : itemsPerPage,
@@ -115,7 +124,7 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
           console.error('Error fetching search results:', error)
         })
     }
-  }, [publishedYear, genre, newRelease, itemsPerPage, currentPage, format, pageCount, query, sort, keywords, yearRange])
+  }, [publishedYear, genre, newRelease, itemsPerPage, currentPage, format, pageCount, query, sort, keywords, yearFrom, yearTo])
 
   // Update filtered items when facets change
   useEffect(() => {
@@ -126,21 +135,6 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
   if (!query) {
     return (
       <div className='flex flex-col md:flex-row gap-6 p-4'>
-        <aside className='w-full md:w-1/3 lg:w-1/4'>
-          <div className='w-full h-full p-4 flex flex-col gap-4 bg-white rounded-lg border-r border-b border-gray-200'>
-            <Filter
-              facets={facets}
-              format={format}
-              updateFilters={updateFilters}
-              genre={genre}
-              pageCount={pageCount ? pageCount.split(',').map(Number) : [0, 1000]}
-              newRelease={newRelease === 'true'}
-              publishedYear={publishedYear}
-              keywords={keywords}
-              yearRange={yearRange}
-            />
-          </div>
-        </aside>
         <main className='w-full md:w-2/3 lg:w-3/4 flex flex-col items-center justify-center'>
           <div className='text-center p-10'>
             <h2 className='text-xl font-semibold text-gray-700 mb-4'>Looking for books?</h2>
@@ -165,23 +159,23 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
             newRelease={newRelease === 'true'}
             publishedYear={publishedYear}
             keywords={keywords}
+            yearFrom={yearFrom}
+            yearTo={yearTo}
           />
         </div>
       </aside>
       <main className='w-full md:w-2/3 lg:w-3/4 flex flex-col gap-4'>
-        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4'>
+        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4 justify-center'>
           <Sort
             value={searchParams.get('sort') || 'title ASC'}
             onChange={handleSortChange}
             options={[
-              { value: 'Sort by...', label: 'Sort by...' },
+              { value: 'Sort by...', label: 'Sort by...', disabled: true },
               { value: 'title ASC', label: 'Title (A-Z)' },
               { value: 'title DESC', label: 'Title (Z-A)' },
               { value: 'author ASC', label: 'Author (A-Z)' },
               { value: 'author DESC', label: 'Author (Z-A)' },
-              { value: 'newRelease DESC', label: 'New Release' },
-              { value: 'pageCount DESC', label: 'Page Count' },
-              { value: 'publishedYear DESC', label: 'Published Year' }
+              { value: 'pageCount DESC', label: 'Page Count' }
             ]}
           />
           <Pagging

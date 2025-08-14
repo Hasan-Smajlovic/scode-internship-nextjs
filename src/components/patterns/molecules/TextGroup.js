@@ -55,7 +55,7 @@ export default function TextGroup ({
   }
 
   return (
-    <div className='mt-5 text-sm text-gray-900'>
+    <div className='text-sm text-gray-900'>
       <Label className='block mb-1 text-sm font-medium'>{label}</Label>
       <div className='flex flex-col w-full'>
         <div className={`flex flex-wrap w-full${text.length > 0 ? ' gap-2 mb-2' : ''}`}>

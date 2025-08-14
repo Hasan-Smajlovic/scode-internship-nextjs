@@ -12,7 +12,7 @@ export default function Select ({
   ...rest
 }) {
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col'>
       {label && (
         <Label className='text-sm text-primary mt-1'>
           {label}

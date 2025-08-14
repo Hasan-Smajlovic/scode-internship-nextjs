@@ -15,6 +15,8 @@ export default function Header () {
     timeoutRef.current = setTimeout(() => {
       router.push(`/searchbook?query=${value}`)
     }, 500)
+
+    // use push if not on search book, use window if on search book
   }
 
   return (

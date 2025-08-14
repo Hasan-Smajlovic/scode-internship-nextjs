@@ -1,3 +1,4 @@
+// Filter.jsx
 import PropTypes from 'prop-types'
 
 import Label from '@/components/patterns/atoms/Label'
@@ -15,8 +16,76 @@ export default function Filter ({
   publishedYear = '',
   newRelease = false,
   keywords = '',
-  yearRange = ['', '']
+  yearFrom = '',
+  yearTo = ''
 }) {
+  const options = (value) => (facets.format && facets.format.find((item) => item.value === value)?.label) ?? value
+
+  const formatOptions = [
+    { value: '', label: 'Select Format', disabled: true }
+  ]
+
+  if (Array.isArray(facets.formats)) {
+    facets.formats.forEach((item) => {
+      if (typeof item === 'string' || typeof item === 'number') {
+        formatOptions.push({ value: options(item), label: options(item) })
+      } else if (item && typeof item === 'object' && 'value' in item) {
+        formatOptions.push({
+          value : options(item.value),
+          label : `${options(item.value)} (${item.count ?? 0})`
+        })
+      }
+    })
+  }
+
+  const genreOptions = [
+    { value: '', label: 'Select Genre', disabled: true }
+  ]
+  if (Array.isArray(facets.genres)) {
+    facets.genres.forEach((item) => {
+      if (typeof item === 'string' || typeof item === 'number') {
+        genreOptions.push({ value: options(item), label: options(item) })
+      } else if (item && typeof item === 'object' && 'value' in item) {
+        genreOptions.push({
+          value : options(item.value),
+          label : `${options(item.value)} (${item.count ?? 0})`
+        })
+      }
+    })
+  }
+
+  const yearOptions = [
+    { value: '', label: 'Select Year', disabled: true }
+  ]
+  if (Array.isArray(facets.years)) {
+    facets.years.forEach((item) => {
+      if (typeof item === 'string' || typeof item === 'number') {
+        yearOptions.push({ value: options(item), label: options(item) })
+      } else if (item && typeof item === 'object' && 'value' in item) {
+        yearOptions.push({
+          value : options(item.value),
+          label : `${options(item.value)} (${item.count ?? 0})`
+        })
+      }
+    })
+  }
+  if (yearOptions.length <= 1) {
+    for (let year = 1993; year <= 2025; year++) {
+      yearOptions.push({ value: String(year), label: String(year) })
+    }
+  }
+  const keywordsList = Array.isArray(facets.keywords)
+    ? facets.keywords
+      .map((item) =>
+        typeof item === 'string'
+          ? options(item)
+          : item && typeof item === 'object' && 'value' in item
+            ? options(item.value)
+            : null
+      )
+      .filter(Boolean)
+    : []
+
   const handleFilterReset = () => {
     updateFilters({
       format        : '',
@@ -24,152 +93,78 @@ export default function Filter ({
       publishedYear : '',
       newRelease    : '',
       keywords      : '',
-      yearRange     : null
+      yearFrom      : '',
+      yearTo        : ''
     })
   }
 
-  // for numbering
-  const formatCounts = (facets.formats || []).reduce((acc, cur) => {
-    acc[cur.value] = cur.count || 0
-    return acc
-  }, {})
-
-  const genreCounts = (facets.genres || []).reduce((acc, cur) => {
-    acc[cur.value] = cur.count || 0
-    return acc
-  }, {})
-
-  const formatOptions = [
-    { value: '', label: 'Select Format', disabled: true },
-    {
-      value : 'hardcover',
-      label : `Hardcover${formatCounts.hardcover > 0 ? ` (${formatCounts.hardcover})` : ''}`
-    },
-    {
-      value : 'paperback',
-      label : `Paperback${formatCounts.paperback > 0 ? ` (${formatCounts.paperback})` : ''}`
-    },
-    {
-      value : 'ebook',
-      label : `eBook${formatCounts.ebook > 0 ? ` (${formatCounts.ebook})` : ''}`
-    },
-    {
-      value : 'audio',
-      label : `Audio Book${formatCounts.audio > 0 ? ` (${formatCounts.audio})` : ''}`
-    }
-  ]
-
-  const genreOptions = [
-    { value: '', label: 'Select Genre', disabled: true },
-    {
-      value : 'fiction',
-      label : `Fiction${genreCounts.fiction > 0 ? ` (${genreCounts.fiction})` : ''}`
-    },
-    {
-      value : 'non-fiction',
-      label : `Non-Fiction${genreCounts['non-fiction'] > 0 ? ` (${genreCounts['non-fiction']})` : ''}`
-    },
-    {
-      value : 'science-fiction',
-      label : `Science Fiction${genreCounts['science-fiction'] > 0 ? ` (${genreCounts['science-fiction']})` : ''}`
-    },
-    {
-      value : 'fantasy',
-      label : `Fantasy${genreCounts.fantasy > 0 ? ` (${genreCounts.fantasy})` : ''}`
-    },
-    {
-      value : 'biography',
-      label : `Biography${genreCounts.biography > 0 ? ` (${genreCounts.biography})` : ''}`
-    }
-  ]
-
   return (
-    <>
-      <div className='flex flex-col gap-6 p-6 bg-white shadow-lg rounded-xl border border-gray-100'>
-        <h2 className='text-xl font-bold text-gray-800'>Filter Books</h2>
-        <div className='space-y-4'>
-          <div>
-            <div className='text-sm text-gray-900' />
-            <Label className='block text-sm font-medium '>Format</Label>
-            <Select
-              options={formatOptions}
-              value={format}
-              onChange={e => {
-                updateFilters({ format: e.target ? e.target.value : e })
-              }}
-            />
-          </div>
-        </div>
-        <div>
-          <div className='text-sm text-gray-900'>
-            <Label className='block mb-1 text-sm font-medium '>Genre</Label>
-            <Select
-              options={genreOptions}
-              value={genre}
-              placeholder='Select Genre'
-              onChange={e => {
-                updateFilters({ genre: e.target ? e.target.value : e })
-              }}
-            />
-          </div>
-          <div className='mt-7 text-sm text-gray-900'>
-            <Label className='block mb-1 text-sm font-medium'>Year</Label>
-            <Select
-              options={[
-                { value: '', label: 'Select Year', disabled: true },
-                ...Array.from({ length: 2025 - 1993 + 1 }, (_, i) => {
-                  const yearOption = (1993 + i).toString()
-                  return { value: yearOption, label: yearOption }
-                })
-              ]}
-              value={publishedYear}
-              placeholder='Select Year'
-              onChange={e => {
-                updateFilters({ publishedYear: e.target ? e.target.value : e })
-              }}
-            />
-          </div>
-
-          <div className='mt-7 text-sm text-gray-900'>
-            <TextGroup
-              label='Keywords'
-              value={keywords}
-              className='h-18.5 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
-              onChange={e => updateFilters({ keywords: e.target ? e.target.value : e })}
-            />
-          </div>
-
-          <YearInput
-            minYear={1900}
-            maxYear={2025}
-            value={yearRange}
-            onChange={(newYearRange) => {
-              setTimeout(() => {
-                updateFilters({ yearRange: newYearRange })
-              }, 1000)
-            }}
-          />
-
-          <div className='mt-5'>
-            <Checkbox
-              label={<span>Show only new releases</span>}
-              checked={!!newRelease}
-              onChange={e => updateFilters({ newRelease: e.target.checked ? true : '' })}
-            />
-          </div>
-        </div>
-        <div className='flex justify-between pt-2'>
-          <Button
-            type='button'
-            variant='primary'
-            className='px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200'
-            onClick={handleFilterReset}
-          >
-            Clear Filters
-          </Button>
-        </div>
+    <div className='flex flex-col gap-6 p-6 bg-white shadow-lg rounded-xl border border-gray-100'>
+      <h2 className='text-xl font-bold text-gray-800'>Filter Books</h2>
+      <div>
+        <Label className='block text-sm font-medium'>Format</Label>
+        <Select
+          options={formatOptions}
+          value={format}
+          onChange={(e) => updateFilters({ format: e.target?.value ?? e })}
+        />
       </div>
-    </>
+      <div>
+        <Label className='block mb-1 text-sm font-medium'>Genre</Label>
+        <Select
+          options={genreOptions}
+          value={genre}
+          onChange={(e) => updateFilters({ genre: e.target?.value ?? e })}
+        />
+      </div>
+
+      <Label className='block mb-1 text-sm font-medium'>Year</Label>
+      <Select
+        options={yearOptions}
+        value={publishedYear}
+        onChange={(e) =>
+          updateFilters({ publishedYear: e.target?.value ?? e })}
+      />
+
+      <TextGroup
+        label='Keywords'
+        value={keywords}
+        onChange={(e) => updateFilters({ keywords: e.target?.value ?? e })}
+        list={keywordsList.length > 0 ? 'keywordsList' : undefined}
+      />
+      {keywordsList.length > 0 && (
+      <datalist id='keywordsList'>
+        {keywordsList.map((keyword, index) => (
+          <option key={`keyword-${index}`} value={keyword} />
+        ))}
+      </datalist>
+      )}
+
+      <YearInput
+        minYear={1600}
+        maxYear={2025}
+        yearFrom={yearFrom}
+        yearTo={yearTo}
+        onChange={updateFilters}
+      />
+      <Checkbox
+        label={<span>Show only new releases</span>}
+        checked={!!newRelease}
+        onChange={(e) =>
+          updateFilters({ newRelease: e.target.checked ? true : '' })}
+      />
+
+      <div className='flex justify-between pt-2'>
+        <Button
+          type='button'
+          variant='primary'
+          className='px-4 py-2 text-sm font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200'
+          onClick={handleFilterReset}
+        >
+          Clear Filters
+        </Button>
+      </div>
+    </div>
   )
 }
 
@@ -181,5 +176,6 @@ Filter.propTypes = {
   newRelease    : PropTypes.bool,
   updateFilters : PropTypes.func,
   keywords      : PropTypes.string,
-  yearRange     : PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.number, PropTypes.string]))
+  yearFrom      : PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  yearTo        : PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }
