@@ -30,15 +30,27 @@ export default function Pagging ({
       }
     } else {
       pages.push({ type: 'page', value: 1 })
-      const start = Math.max(2, currentPage - 1)
-      const end = Math.min(totalPages - 1, currentPage + 1)
+
+      let start = Math.max(2, currentPage - 1)
+      let end = Math.min(totalPages - 1, currentPage + 1)
+
+      // Ensure we show exactly maxPagesToShow when possible
+      if (currentPage <= 3) {
+        start = 2
+        end = 4
+      } else if (currentPage >= totalPages - 2) {
+        start = totalPages - 3
+        end = totalPages - 1
+      }
+
+      if (start > 2) pages.push({ type: 'ellipsis' })
 
       for (let i = start; i <= end; i++) {
         pages.push({ type: 'page', value: i })
       }
-      if (end < totalPages - 1) {
-        pages.push({ type: 'page' })
-      }
+
+      if (end < totalPages - 1) pages.push({ type: 'ellipsis' })
+
       pages.push({ type: 'page', value: totalPages })
     }
     return pages
@@ -87,7 +99,10 @@ export default function Pagging ({
                   type='button'
                   variant='secondary'
                   onClick={() => handlePageChange(item.value)}
-                  className={`px-4 py-2 rounded-lg ${currentPage === item.value ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                  className={`px-4 py-2 rounded-lg 
+          ${currentPage === item.value
+            ? 'bg-primary text-white'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                 >
                   {item.value}
                 </Button>

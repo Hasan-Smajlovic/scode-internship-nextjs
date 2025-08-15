@@ -34,7 +34,8 @@ export async function POST (request) {
       items         : result.items,
       totalCount    : result.totalCount,
       facets        : result.facets,
-      searchRequest : result.searchRequest
+      searchRequest : result.searchRequest,
+      aggregation   : result.aggregation
     })
   } catch (error) {
     console.error('Search API error:', error)

@@ -1,4 +1,3 @@
-// Filter.jsx
 import PropTypes from 'prop-types'
 
 import Label from '@/components/patterns/atoms/Label'
@@ -19,72 +18,74 @@ export default function Filter ({
   yearFrom = '',
   yearTo = ''
 }) {
-  const options = (value) => (facets.format && facets.format.find((item) => item.value === value)?.label) ?? value
+  const keepOtherLabels = (facetArr, value) =>
+    Array.isArray(facetArr)
+      ? facetArr.find(item => typeof item === 'object' && item.value === value)?.label || value
+      : value
 
-  const formatOptions = [
-    { value: '', label: 'Select Format', disabled: true }
-  ]
+  const prepareFilterOptions = (facets) => {
+    const formatOptions = [{ value: '', label: 'Select Format', disabled: true }]
+    const genreOptions = [{ value: '', label: 'Select Genre', disabled: true }]
+    const yearOptions = [{ value: '', label: 'Select Year', disabled: true }]
 
-  if (Array.isArray(facets.formats)) {
-    facets.formats.forEach((item) => {
-      if (typeof item === 'string' || typeof item === 'number') {
-        formatOptions.push({ value: options(item), label: options(item) })
-      } else if (item && typeof item === 'object' && 'value' in item) {
-        formatOptions.push({
-          value : options(item.value),
-          label : `${options(item.value)} (${item.count ?? 0})`
-        })
-      }
-    })
-  }
-
-  const genreOptions = [
-    { value: '', label: 'Select Genre', disabled: true }
-  ]
-  if (Array.isArray(facets.genres)) {
-    facets.genres.forEach((item) => {
-      if (typeof item === 'string' || typeof item === 'number') {
-        genreOptions.push({ value: options(item), label: options(item) })
-      } else if (item && typeof item === 'object' && 'value' in item) {
-        genreOptions.push({
-          value : options(item.value),
-          label : `${options(item.value)} (${item.count ?? 0})`
-        })
-      }
-    })
-  }
-
-  const yearOptions = [
-    { value: '', label: 'Select Year', disabled: true }
-  ]
-  if (Array.isArray(facets.years)) {
-    facets.years.forEach((item) => {
-      if (typeof item === 'string' || typeof item === 'number') {
-        yearOptions.push({ value: options(item), label: options(item) })
-      } else if (item && typeof item === 'object' && 'value' in item) {
-        yearOptions.push({
-          value : options(item.value),
-          label : `${options(item.value)} (${item.count ?? 0})`
-        })
-      }
-    })
-  }
-  if (yearOptions.length <= 1) {
-    for (let year = 1993; year <= 2025; year++) {
-      yearOptions.push({ value: String(year), label: String(year) })
+    // Process format options
+    if (Array.isArray(facets.formats)) {
+      facets.formats.forEach(item => {
+        const value = typeof item === 'object' ? item.value : item
+        const label =
+          typeof item === 'object'
+            ? `${item.label ?? item.value}${item.count !== undefined ? ` (${item.count})` : ''}`
+            : item
+        formatOptions.push({ value, label })
+      })
     }
+
+    // Process genre options
+    if (Array.isArray(facets.genres)) {
+      facets.genres.forEach(item => {
+        const value = typeof item === 'object' ? item.value : item
+        const label =
+          typeof item === 'object'
+            ? `${item.label ?? item.value}${item.count !== undefined ? ` (${item.count})` : ''}`
+            : keepOtherLabels(facets.genres, item)
+        genreOptions.push({ value, label })
+      })
+    }
+
+    // Process year options
+    if (Array.isArray(facets.years)) {
+      facets.years.forEach(item => {
+        const value = typeof item === 'object' ? item.value : item
+        const label =
+          typeof item === 'object'
+            ? `${item.label ?? item.value}${item.count !== undefined ? ` (${item.count})` : ''}`
+            : keepOtherLabels(facets.years, item)
+        yearOptions.push({ value, label })
+      })
+    }
+
+    return { formatOptions, genreOptions, yearOptions }
   }
-  const keywordsList = Array.isArray(facets.keywords)
-    ? facets.keywords
-      .map((item) =>
-        typeof item === 'string'
-          ? options(item)
-          : item && typeof item === 'object' && 'value' in item
-            ? options(item.value)
-            : null
-      )
-      .filter(Boolean)
-    : []
+
+  const prepareKeywordsOptions = (facets) => {
+    const keywordsList = []
+
+    // Generate keywords list
+    if (Array.isArray(facets.keywords)) {
+      facets.keywords.forEach(item => {
+        const value = typeof item === 'object' ? item.value : item
+        const label = typeof item === 'object'
+          ? item.label ?? item.value
+          : keepOtherLabels(facets.keywords, item)
+        keywordsList.push({ value, label })
+      })
+    }
+
+    return { keywordsList }
+  }
+
+  const { formatOptions, genreOptions, yearOptions } = prepareFilterOptions(facets)
+  const { keywordsList } = prepareKeywordsOptions(facets)
 
   const handleFilterReset = () => {
     updateFilters({
@@ -106,7 +107,7 @@ export default function Filter ({
         <Select
           options={formatOptions}
           value={format}
-          onChange={(e) => updateFilters({ format: e.target?.value ?? e })}
+          onChange={e => updateFilters({ format: e.target?.value ?? e, page: 1 })}
         />
       </div>
       <div>
@@ -114,46 +115,36 @@ export default function Filter ({
         <Select
           options={genreOptions}
           value={genre}
-          onChange={(e) => updateFilters({ genre: e.target?.value ?? e })}
+          onChange={e => updateFilters({ genre: e.target?.value ?? e, page: 1 })}
         />
       </div>
-
-      <Label className='block mb-1 text-sm font-medium'>Year</Label>
-      <Select
-        options={yearOptions}
-        value={publishedYear}
-        onChange={(e) =>
-          updateFilters({ publishedYear: e.target?.value ?? e })}
-      />
-
+      <div>
+        <Label className='block text-sm font-medium'>Year</Label>
+        <Select
+          options={yearOptions}
+          value={publishedYear}
+          onChange={e => updateFilters({ publishedYear: e.target?.value ?? e, page: 1 })}
+        />
+      </div>
       <TextGroup
         label='Keywords'
         value={keywords}
-        onChange={(e) => updateFilters({ keywords: e.target?.value ?? e })}
+        onChange={e => updateFilters({ keywords: e.target?.value ?? e, page: 1 })}
         list={keywordsList.length > 0 ? 'keywordsList' : undefined}
       />
       {keywordsList.length > 0 && (
-      <datalist id='keywordsList'>
-        {keywordsList.map((keyword, index) => (
-          <option key={`keyword-${index}`} value={keyword} />
-        ))}
-      </datalist>
+        <datalist id='keywordsList'>
+          {keywordsList.map((keyword, index) => (
+            <option key={`keyword-${index}`} value={keyword.value || keyword.label} />
+          ))}
+        </datalist>
       )}
-
-      <YearInput
-        minYear={1600}
-        maxYear={2025}
-        yearFrom={yearFrom}
-        yearTo={yearTo}
-        onChange={updateFilters}
-      />
+      <YearInput minYear={1600} maxYear={2025} yearFrom={yearFrom} yearTo={yearTo} onChange={updateFilters} />
       <Checkbox
         label={<span>Show only new releases</span>}
         checked={!!newRelease}
-        onChange={(e) =>
-          updateFilters({ newRelease: e.target.checked ? true : '' })}
+        onChange={e => updateFilters({ newRelease: e.target.checked ? true : '', page: 1 })}
       />
-
       <div className='flex justify-between pt-2'>
         <Button
           type='button'

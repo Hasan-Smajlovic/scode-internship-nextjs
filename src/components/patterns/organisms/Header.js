@@ -1,6 +1,5 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import { useRef } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 
 import Image from '../../patterns/atoms/Image'
 import Link from '../../patterns/atoms/Link'
@@ -8,15 +7,21 @@ import Search from '../../patterns/molecules/Search'
 
 export default function Header () {
   const router = useRouter()
-  const timeoutRef = useRef(null)
+  const pathname = usePathname()
+  let searchTimeout = null
 
   const handleSearchChange = value => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    timeoutRef.current = setTimeout(() => {
-      router.push(`/searchbook?query=${value}`)
-    }, 500)
+    if (searchTimeout) clearTimeout(searchTimeout)
 
-    // use push if not on search book, use window if on search book
+    searchTimeout = setTimeout(() => {
+      const searchQuery = `query=${encodeURIComponent(value)}`
+      if (pathname === '/searchbook') { // use push if not on search book, use window if on search book
+        const newUrl = `/searchbook?${searchQuery}`
+        window.history.pushState({}, '', newUrl)
+      } else {
+        router.push(`/searchbook?${searchQuery}`)
+      }
+    }, 500)
   }
 
   return (

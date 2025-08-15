@@ -80,75 +80,111 @@ class DBObject {
     if (filters.publishedYear && filters.publishedYear) {
       query.publishedDate = { $regex: `^${filters.publishedYear}` } // here all years will be handled
     }
-    if (filters.format) query.format = filters.format // filtering for format
-    if (filters.genre) query.genre = filters.genre // filtering for genre
-    if (filters.newRelease) query.newRelease = filters.newRelease // filtering for new releases
-    if (filters.keywords) query.keywords = filters.keywords // filtering for keywords
+    if (filters.format) {
+      query.format = filters.format // filtering for format
+    }
+    if (filters.genre) {
+      query.genre = filters.genre // filtering for genre
+    }
+    if (filters.newRelease) {
+      query.newRelease = filters.newRelease // filtering for new releases
+    }
+    if (filters.keywords) {
+      query.keywords = filters.keywords // filtering for keywords
+    }
 
-    if (filters.yearTo || filters.yearFrom) {
+    if (filters.yearTo || filters.yearFrom) { // i removed 0,4 so that my full date works instead of just year
       const dateQuery = {}
 
-      if (filters.yearFrom && !isNaN(filters.yearFrom)) {
+      if (filters.yearFrom && filters.yearFrom.trim() !== '') {
         dateQuery.$gte = filters.yearFrom
       }
-
-      if (filters.yearTo && !isNaN(filters.yearTo)) {
+      if (filters.yearTo && filters.yearTo.trim() !== '') {
         dateQuery.$lte = filters.yearTo
       }
-
       if (Object.keys(dateQuery).length > 0) {
-        query.$and = query.$and || []
-        query.$and.push({
-          $expr: {
-            $and: [
-              ...(dateQuery.$gte ? [{ $gte: [{ $toInt: { $substr: ['$publishedDate', 0, 4] } }, parseInt(filters.yearFrom)] }] : []),
-              ...(dateQuery.$lte ? [{ $lte: [{ $toInt: { $substr: ['$publishedDate', 0, 4] } }, parseInt(filters.yearTo)] }] : [])
-            ]
-          }
-        })
+        query.publishedDate = dateQuery
       }
     }
     const [sortField, sortOrder] = sort.split(' ')
     const sortQuery = { [sortField]: sortOrder.toLowerCase() === 'asc' ? 1 : -1 }
     const skip = (page - 1) * pageSize
 
+    let formatsQuery = query
+    let genresQuery = query
+    let keywordsQuery = query
+    let yearsQuery = query
+
+    if (query.format) {
+      const { format, ...rest } = query
+      formatsQuery = rest
+    }
+    if (query.genre) {
+      const { genre, ...rest } = query
+      genresQuery = rest
+    }
+    if (query.keywords) {
+      const { keywords, ...rest } = query
+      keywordsQuery = rest
+    }
+    if (query.publishedDate) {
+      const { publishedDate, ...rest } = query
+      yearsQuery = rest
+    }
+
     const aggregation = [
-      { $match: query },
       {
         $facet: {
           items: [
+            { $match: query },
             { $sort: sortQuery },
             { $skip: skip },
             { $limit: pageSize }
           ],
           totalCount: [
+            { $match: query },
             { $count: 'count' }
           ],
           formats: [
+            { $match: formatsQuery },
             { $unwind: '$format' },
             { $group: { _id: '$format', count: { $sum: 1 } } },
             { $project: { value: '$_id', count: 1, _id: 0 } }
           ],
           genres: [
+            { $match: genresQuery },
             { $unwind: '$genre' },
             { $group: { _id: '$genre', count: { $sum: 1 } } },
             { $project: { value: '$_id', count: 1, _id: 0 } }
           ],
           keywords: [
+            { $match: keywordsQuery },
             { $unwind: '$keywords' },
             { $group: { _id: '$keywords', count: { $sum: 1 } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } }
+          ],
+          years: [
+            { $match: yearsQuery },
+            {
+              $project: {
+                year: { $substr: ['$publishedDate', 0, 4] } // this is for published year since it is only a year
+              }
+            },
+            { $group: { _id: '$year', count: { $sum: 1 } } },
+            { $match: { _id: { $ne: null } } },
             { $project: { value: '$_id', count: 1, _id: 0 } }
           ]
         }
       }
     ]
 
-    aggregation[1].$facet.formats.push({ $sort: { count: -1 } })
-    aggregation[1].$facet.genres.push({ $sort: { count: -1 } })
-    aggregation[1].$facet.keywords.push({ $sort: { count: -1 } })
+    // Add sorting to your facets
+    aggregation[0].$facet.formats.push({ $sort: { count: -1 } })
+    aggregation[0].$facet.genres.push({ $sort: { count: -1 } })
+    aggregation[0].$facet.keywords.push({ $sort: { count: -1 } })
+    aggregation[0].$facet.years.push({ $sort: { _id: -1 } })
 
     const [result] = await this.collection.aggregate(aggregation).toArray()
-    console.log(result)
     return {
       searchRequest : searchObject,
       items         : result.items.map(({ _id, ...rest }) => ({ ...rest, id: _id.toString() })),
@@ -156,11 +192,10 @@ class DBObject {
       facets        : {
         formats  : result.formats,
         genres   : result.genres,
-        authors  : result.authors,
         keywords : result.keywords,
-        yearTo   : result.yearTo,
-        yearFrom : result.yearFrom
-      }
+        years    : result.years
+      },
+      aggregation
     }
   }
 }
