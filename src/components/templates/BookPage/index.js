@@ -1,7 +1,7 @@
 'use client'
 import PropTypes from 'prop-types'
 import { useState } from 'react'
-import { FaUser, FaBook, FaKeyboard, FaFileAlt } from 'react-icons/fa'
+import { FaUser, FaBook, FaFileAlt } from 'react-icons/fa'
 
 import { BookSchema } from '@/lib/validation/bookSchema'
 import Alert from '@/components/patterns/atoms/Alert'
@@ -364,7 +364,6 @@ export default function BookFormApi ({
             <TextGroup
               id='keywords'
               name='keywords'
-              icon={<FaKeyboard />}
               placeholder='Enter keywords'
               value={typeof keywordsState === 'string'
                 ? keywordsState
@@ -373,7 +372,7 @@ export default function BookFormApi ({
               label='Keywords'
               description='Keywords for search optimization.'
               error={errors.keywords}
-              className='h-18 flex items-center gap-3 bg-gray-100 p-2 rounded-md shadow-sm'
+              className='h-22.5 px-4 border w-133 border-none rounded-md focus:outline-none focus:ring text-sm bg-gray-100 mt-3'
             />
           </div>
 
@@ -382,7 +381,7 @@ export default function BookFormApi ({
               id='format'
               name='format'
               label='Format'
-              className='bg-gray-50 w-full'
+              className='bg-gray-50 w-full 22.5 outline'
               placeholder='Select format...'
               options={[
                 { value: 'hardcover', label: 'Hardcover' },

@@ -41,7 +41,7 @@ export default function InputLabel ({
           onChange={onChange}
           onBlur={onBlur}
           {...inputProps}
-          className='flex-1 border-none bg-transparent focus:outline-none text-gray-900'
+          className='h-18.5 px-4 border w-120 border-none rounded-md focus:outline-none focus:ring text-sm'
         />
       </div>
 
