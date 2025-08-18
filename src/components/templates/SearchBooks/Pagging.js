@@ -34,7 +34,7 @@ export default function Pagging ({
       let start = Math.max(2, currentPage - 1)
       let end = Math.min(totalPages - 1, currentPage + 1)
 
-      // Ensure we show exactly maxPagesToShow when possible
+      // to show exactly maxPagesToShow when possible
       if (currentPage <= 3) {
         start = 2
         end = 4
