@@ -4,7 +4,7 @@ import Label from '@/components/patterns/atoms/Label'
 import Select from '@/components/patterns/atoms/Select'
 import Button from '@/components/patterns/atoms/Button'
 import Checkbox from '@/components/patterns/atoms/Checkbox'
-import YearInput from '@/components/templates/SearchBooks/YearInput'
+import YearInput from '@/components/patterns/molecules/YearInput'
 
 export default function Filter ({
   facets = {},

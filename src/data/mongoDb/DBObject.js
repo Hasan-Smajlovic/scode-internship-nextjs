@@ -198,6 +198,9 @@ class DBObject {
       aggregation
     }
   }
-}
 
+  async searchOnlyWithFacets (searchObject) {
+    const { title, description, filters } = searchObject
+  }
+}
 export default DBObject

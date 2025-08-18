@@ -19,7 +19,7 @@ export default function Textarea ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className='mt-3 w-full h-15 px-4 border p-4 bg-gray-50 border-gray-300 rounded-md outline:none focus:outline-none focus:ring-2 focus:ring-blue-500'
+        className='h-22.5 mt-2 w-133.5 text-sm shadow-sm px-4 border p-8 bg-gray-50 show-sm border-gray-300 rounded-md outline:none focus:outline-none focus:ring-2 focus:ring-blue-500'
         rows={rows}
         {...rest}
       />

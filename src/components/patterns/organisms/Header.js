@@ -34,7 +34,8 @@ export default function Header () {
           </div>
           <nav className='flex space-x-6'>
             <Link href='/' className='hover:text-primary-300 transition'>Home</Link>
-            <Link href='/custompage' className='hover:text-primary-300 transition'>Custom Page</Link>
+            <Link href='/addbook' className='hover:text-primary-300 transition'>Add Book</Link>
+            <Link href='/addcontentpage' className='hover:text-primary-300 transition'>Add Content Page</Link>
             <div className='mb-6'>
               <Search
                 onChange={handleSearchChange}

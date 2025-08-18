@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 
-import Multiselect from '../../patterns/molecules/Multiselect'
-import Chip from '../../patterns/atoms/Chip'
-import Alert from '../../patterns/atoms/Alert'
+import Multiselect from './Multiselect'
+import Chip from '../atoms/Chip'
+import Alert from '../atoms/Alert'
 
 export default function MultiselectGroup ({
   id,
@@ -19,7 +19,6 @@ export default function MultiselectGroup ({
   const [text, setText] = useState([])
 
   useEffect(() => {
-    console.log('MultiselectGroup syncing value:', value)
     if (Array.isArray(value)) {
       setText(value)
     } else {

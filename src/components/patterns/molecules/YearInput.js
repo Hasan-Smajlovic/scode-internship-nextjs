@@ -13,7 +13,7 @@ export default function YearInput ({ minYear, maxYear, yearFrom, yearTo, onChang
             max={`${maxYear}-12-31`}
             placeholder={`${minYear}-01-01`}
             value={yearFrom}
-            className='h-10 sm:h-12 w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md
+            className='h-10 sm:h-12 w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md mt-4 bg-gray-50
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
             onChange={e => {
               onChange({ yearFrom: e.target.value, page: 1 })
@@ -29,7 +29,7 @@ export default function YearInput ({ minYear, maxYear, yearFrom, yearTo, onChang
             max={`${maxYear}-12-31`}
             placeholder={`${maxYear}-12-31`}
             value={yearTo}
-            className='h-10 sm:h-12 w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md
+            className='h-10 sm:h-12 w-full px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-md bg-gray-50
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm'
             onChange={e => {
               onChange({ yearTo: e.target.value, page: 1 })

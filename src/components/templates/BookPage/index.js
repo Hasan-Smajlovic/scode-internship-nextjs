@@ -12,7 +12,7 @@ import Select from '@/components/patterns/atoms/Select'
 import AuthorInput from '@/components/patterns/molecules/AuthorInput'
 import TextGroup from '@/components/patterns/molecules/TextGroup'
 import Textarea from '@/components/patterns/molecules/Textarea'
-import MultiselectGroup from './MultiselectGroup'
+import MultiselectGroup from '../../patterns/molecules/MultiselectGroup'
 
 export default function BookFormApi ({
   title = '',

@@ -25,7 +25,7 @@ export default function InputLabel ({
         {required && <span className='text-red-500 ml-1'>*</span>}
       </Label>
 
-      <div className='flex items-center gap-3 bg-gray-100 p-2 rounded-md shadow-sm'>
+      <div className='flex items-center gap-3 rounded-md text-sm'>
         {icon && (
           <div className='flex-shrink-0'>
             <Icon className='text-gray-500 h-5 w-5'>
@@ -41,7 +41,7 @@ export default function InputLabel ({
           onChange={onChange}
           onBlur={onBlur}
           {...inputProps}
-          className='h-18.5 px-4 border w-120 border-none rounded-md focus:outline-none focus:ring text-sm'
+          className='h-22.5 px-4 border w-120 shadow-sm rounded-md focus:outline-none focus:ring text-sm bg-gray-50 show-sm border-gray-300 outline:none focus:ring-blue-500'
         />
       </div>
 
