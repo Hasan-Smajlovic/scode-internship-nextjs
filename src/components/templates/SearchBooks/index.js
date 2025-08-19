@@ -178,7 +178,7 @@ export default function SearchBooks ({ items: initialItems, totalCount: initialT
               { value: 'Sort by...', label: 'Sort by...', disabled: true },
               { value: 'title ASC', label: 'Title (A-Z)' },
               { value: 'title DESC', label: 'Title (Z-A)' },
-              { value: 'pageCount DESC', label: 'Page Count' }
+              { value: 'pageCount ASC', label: 'Page Count' }
             ]}
           />
           <Pagging

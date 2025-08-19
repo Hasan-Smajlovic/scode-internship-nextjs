@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Image from '../../patterns/atoms/Image'
 import Link from '../../patterns/atoms/Link'
 import Search from '../../patterns/molecules/Search'
+import Dropdown from '../../templates/addContentPage/Dropdown'
 
 export default function Header () {
   const router = useRouter()
@@ -12,7 +13,6 @@ export default function Header () {
 
   const handleSearchChange = value => {
     if (searchTimeout) clearTimeout(searchTimeout)
-
     searchTimeout = setTimeout(() => {
       const searchQuery = `query=${encodeURIComponent(value)}`
       if (pathname === '/searchbook') { // use push if not on search book, use window if on search book
@@ -36,6 +36,7 @@ export default function Header () {
             <Link href='/' className='hover:text-primary-300 transition'>Home</Link>
             <Link href='/addbook' className='hover:text-primary-300 transition'>Add Book</Link>
             <Link href='/addcontentpage' className='hover:text-primary-300 transition'>Add Content Page</Link>
+            <Dropdown />
             <div className='mb-6'>
               <Search
                 onChange={handleSearchChange}

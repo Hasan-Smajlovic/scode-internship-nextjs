@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types'
-import { cache } from 'react'
 
 import SearchBook from '@/components/templates/SearchBooks/index'
 import DBObject from '@/data/mongoDb/DBObject'
 
-const getItemsBySearchQuery = cache(async (searchParams) => {
+const getItemsBySearchQuery = async (searchParams) => {
   const {
     page = '1',
     format = '',
@@ -44,7 +43,7 @@ const getItemsBySearchQuery = cache(async (searchParams) => {
     ...await dbObject.searchWithFacets(searchObject),
     searchRequest: searchObject
   }
-})
+}
 
 export default async function SearchBooks (props) {
   const params = props.searchParams ? await Promise.resolve(props.searchParams) : {}
@@ -53,6 +52,8 @@ export default async function SearchBooks (props) {
     const currentPage = params.page || '1'
     return (
       <main className='bg-white min-h-screen'>
+        <h1 className='text-2xl font-bold mb-4'>Search Results</h1>
+        <p className='text-gray-600 mb-4'>Showing results for: {params.query}</p>
         <SearchBook
           items={response.items || []}
           totalCount={response.totalCount || 0}

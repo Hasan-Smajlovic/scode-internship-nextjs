@@ -74,7 +74,6 @@ export default function BookFormApi ({
 
   const handleResetForm = () => {
     resetForm()
-    console.log('After reset, genreState:', genreState)
     showResetAlert({
       type     : 'info',
       children : 'Form has been reset!',
@@ -84,7 +83,6 @@ export default function BookFormApi ({
   }
 
   const handleResetGenre = (selected) => {
-    console.log('Selected genres:', selected)
     const filtered = selected.filter(val => typeof val === 'string' && val.trim() !== '')
     const unique = Array.from(new Set(filtered))
     setGenre(unique)

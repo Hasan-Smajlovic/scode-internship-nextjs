@@ -199,8 +199,75 @@ class DBObject {
     }
   }
 
-  async searchOnlyWithFacets (searchObject) {
-    const { title, description, filters } = searchObject
+  async searchOnlyWithFacets ({ filters = {}, sort = 'title ASC' }) {
+    const query = {}
+
+    // Validate sort
+    const [sortField, sortOrder] = sort.split(' ')
+    const sortQuery = { [sortField]: sortOrder.toLowerCase() === 'asc' ? 1 : -1 }
+
+    const normalize = (val) => !val ? [] : Array.isArray(val) ? val : [val]
+
+    if (filters.format) query.format = { $in: normalize(filters.format) }
+    if (filters.genre) query.genre = { $in: normalize(filters.genre) }
+    if (filters.keywords) query.keywords = { $in: normalize(filters.keywords) }
+    if (filters.newRelease !== undefined) query.newRelease = filters.newRelease
+    if (filters.yearFrom || filters.yearTo) {
+      query.publishedDate = {}
+      if (filters.yearFrom) query.publishedDate.$gte = filters.yearFrom
+      if (filters.yearTo) query.publishedDate.$lte = filters.yearTo
+    }
+
+    const aggregation = [
+      { $match: query },
+      { $sort: sortQuery },
+      {
+        $facet: {
+          formats: [
+            { $unwind: { path: '$format', preserveNullAndEmptyArrays: true } },
+            { $group: { _id: '$format', count: { $sum: 1 } } },
+            { $match: { _id: { $ne: null } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } },
+            { $sort: { count: -1 } }
+          ],
+          genres: [
+            { $unwind: { path: '$genre', preserveNullAndEmptyArrays: true } },
+            { $group: { _id: '$genre', count: { $sum: 1 } } },
+            { $match: { _id: { $ne: null } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } },
+            { $sort: { count: -1 } }
+          ],
+          keywords: [
+            { $unwind: '$keywords' },
+            { $group: { _id: '$keywords', count: { $sum: 1 } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } },
+            { $sort: { count: -1 } }
+          ],
+          years: [
+            { $project: { year: { $substr: [{ $toString: '$publishedDate' }, 0, 4] } } },
+            { $group: { _id: '$year', count: { $sum: 1 } } },
+            { $match: { _id: { $ne: null } } },
+            { $project: { value: '$_id', count: 1, _id: 0 } },
+            { $sort: { value: -1 } }
+          ]
+        }
+      }
+    ]
+
+    const [result] = await this.collection.aggregate(aggregation).toArray()
+
+    return {
+      searchRequest: {
+        filters,
+        sort
+      },
+      facets: {
+        format   : result.formats,
+        genre    : result.genres,
+        keywords : result.keywords,
+        year     : result.years
+      }
+    }
   }
 }
 export default DBObject
