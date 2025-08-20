@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Image from '../../patterns/atoms/Image'
 import Link from '../../patterns/atoms/Link'
 import Search from '../../patterns/molecules/Search'
-import Dropdown from '../../templates/addContentPage/Dropdown'
+import Dropdown from '../../templates/addContentForm/Dropdown'
 
 export default function Header () {
   const router = useRouter()

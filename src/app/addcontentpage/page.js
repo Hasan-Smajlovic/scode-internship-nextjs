@@ -1,4 +1,4 @@
-import AddContentPage from '@/components/templates/addContentPage'
+import AddContentPage from '@/components/templates/addContentForm'
 
 export default function AddContentPageWrapper () {
   return (

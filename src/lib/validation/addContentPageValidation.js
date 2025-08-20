@@ -28,10 +28,6 @@ export default function addContentPageValidation (fields) {
     errors.keywords = 'Please select at least one keyword'
   }
 
-  if (fields.yearFrom && fields.yearTo && Number(fields.yearFrom) > Number(fields.yearTo)) {
-    errors.yearRange = 'Starting year cannot be greater than ending year'
-  }
-
   return {
     isValid: Object.keys(errors).length === 0,
     errors

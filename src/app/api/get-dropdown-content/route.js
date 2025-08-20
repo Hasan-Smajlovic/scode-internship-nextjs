@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import DBObject from '@/data/mongoDb/DBObject'
 
-export async function POST (id) {
+export async function POST () {
   try {
     const db = new DBObject('content')
     await db.init()

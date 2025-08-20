@@ -26,6 +26,9 @@ export default function Filter ({
     return formatedFacets
   }
 
+  // Ensure scalar values for <select> value props
+  const getScalar = val => Array.isArray(val) ? (val[0] ?? '') : (val ?? '')
+
   const handleFilterReset = () => {
     updateFilters({
       format        : '',
@@ -45,7 +48,7 @@ export default function Filter ({
         <Label className='block text-sm font-medium'>Format</Label>
         <Select
           options={formatFilterOptions(facets.formats, 'Format')}
-          value={format}
+          value={getScalar(format)}
           onChange={e => updateFilters({ format: e.target?.value ?? e, page: 1 })}
         />
       </div>
@@ -53,7 +56,7 @@ export default function Filter ({
         <Label className='block mb-1 text-sm font-medium'>Genre</Label>
         <Select
           options={formatFilterOptions(facets.genres, 'Genre')}
-          value={genre}
+          value={getScalar(genre)}
           onChange={e => updateFilters({ genre: e.target?.value ?? e, page: 1 })}
         />
       </div>
@@ -61,7 +64,7 @@ export default function Filter ({
         <Label className='block text-sm font-medium'>Year</Label>
         <Select
           options={formatFilterOptions(facets.years, 'Year')}
-          value={publishedYear}
+          value={getScalar(publishedYear)}
           onChange={e => updateFilters({ publishedYear: e.target?.value ?? e, page: 1 })}
         />
       </div>
@@ -69,7 +72,7 @@ export default function Filter ({
         <Label className='block text-sm font-medium'>Keyword</Label>
         <Select
           options={formatFilterOptions(facets.keywords, 'Keyword')}
-          value={keywords}
+          value={getScalar(keywords)}
           onChange={e => updateFilters({ keywords: e.target?.value ?? e, page: 1 })}
         />
       </div>
@@ -95,12 +98,12 @@ export default function Filter ({
 
 Filter.propTypes = {
   facets        : PropTypes.object,
-  format        : PropTypes.string,
-  genre         : PropTypes.string,
-  publishedYear : PropTypes.string,
+  format        : PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  genre         : PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  publishedYear : PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   newRelease    : PropTypes.bool,
   updateFilters : PropTypes.func,
-  keywords      : PropTypes.string,
+  keywords      : PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   yearFrom      : PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   yearTo        : PropTypes.oneOfType([PropTypes.number, PropTypes.string])
 }

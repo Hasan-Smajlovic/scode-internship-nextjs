@@ -1,48 +1,58 @@
 import { NextResponse } from 'next/server'
-
-import { DEFAULT_PAGE_SIZE } from '@/constants/paging'
 import DBObject from '@/data/mongoDb/DBObject'
 
 export async function POST (request) {
   try {
-    const body = await request.json()
-    const {
-      searchTerm = '',
-      filters = {},
-      page = 1,
-      pageSize = DEFAULT_PAGE_SIZE,
-      sort = ''
-    } = body
-
-    const parsedPage = parseInt(page, 10) || 1
-    const parsedPageSize = parseInt(pageSize, 10) || DEFAULT_PAGE_SIZE
-
-    const dbObject = new DBObject('books')
-    await dbObject.init()
-
-    const result = await dbObject.searchWithFacets({
+    const requestData = await request.json()
+    const { searchTerm, filters, sort, page, pageSize } = requestData
+    console.log('API received search request:', {
       searchTerm,
       filters,
-      page     : parsedPage,
-      pageSize : parsedPageSize,
-      sort
+      sort,
+      page,
+      pageSize
     })
+    // validate searchTerm
+    const cleanSearchTerm = typeof searchTerm === 'string' ? searchTerm : ''
+    // Create a new DBObject for books collection
+    const dbObject = new DBObject('books')
+    await dbObject.init()
+    // Make the search request with proper error handling
+    try {
+      const searchResults = await dbObject.searchWithFacets({
+        searchTerm : cleanSearchTerm,
+        filters    : filters || {},
+        sort       : sort || 'title ASC',
+        page       : Number(page) || 1,
+        pageSize   : Number(pageSize) || 10
+      })
 
-    return NextResponse.json({
-      success       : true,
-      status        : 200,
-      items         : result.items,
-      totalCount    : result.totalCount,
-      facets        : result.facets,
-      searchRequest : result.searchRequest,
-      aggregation   : result.aggregation
-    })
+      return NextResponse.json(searchResults)
+    } catch (searchError) {
+      console.error('Error in searchWithFacets:', searchError)
+
+      // Check if it's a regex error
+      if (searchError.message && searchError.message.includes('Regular expression')) {
+        // Return a more user-friendly response for regex errors
+        return NextResponse.json({
+          error      : 'Invalid search pattern',
+          details    : 'Your search contains special characters that cannot be processed.',
+          items      : [],
+          totalCount : 0,
+          facets     : {}
+        }, { status: 400 })
+      }
+      throw searchError
+    }
   } catch (error) {
-    console.error('Search API error:', error)
+    console.error('Search API error:', error.stack || error)
     return NextResponse.json({
-      success : false,
-      message : 'Error fetching books',
-      error   : error.message
+      error      : 'An error occurred while searching books',
+      details    : error.message,
+      stack      : process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      items      : [],
+      totalCount : 0,
+      facets     : {}
     }, { status: 500 })
   }
 }

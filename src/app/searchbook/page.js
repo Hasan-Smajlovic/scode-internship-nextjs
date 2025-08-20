@@ -64,7 +64,7 @@ export default async function SearchBooks (props) {
       </main>
     )
   } catch (error) {
-    console.log('Error fetching search results:', error)
+    console.error('Error fetching search results:', error)
     throw error
   }
 }

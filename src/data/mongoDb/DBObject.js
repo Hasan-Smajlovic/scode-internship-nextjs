@@ -269,5 +269,15 @@ class DBObject {
       }
     }
   }
+
+  async getById (id) {
+    try {
+      const objectId = new ObjectId(id)
+      return await this.collection.findOne({ _id: objectId })
+    } catch (error) {
+      console.error('Error fetching document by ID:', error)
+      return null
+    }
+  }
 }
 export default DBObject
