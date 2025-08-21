@@ -76,23 +76,17 @@ class DBObject {
         { shortDescription: { $regex: searchTerm, $options: 'i' } }
       ]
     }
-    if (filters.publishedYear) query.publishedDate = { $regex: `^${filters.publishedYear}` } // validation for published year
-    if (filters.publishedYear && filters.publishedYear) {
-      query.publishedDate = { $regex: `^${filters.publishedYear}` } // here all years will be handled
-    }
-    if (filters.format) {
-      query.format = filters.format // filtering for format
-    }
-    if (filters.genre) {
-      query.genre = filters.genre // filtering for genre
-    }
+    if (filters.publishedYear?.length) {
+      query.publishedDate = {
+        $in: filters.publishedYear.map(y => new RegExp(`^${y}`))
+      }
+    } // validation for published year
+    if (filters.format?.length) query.format = { $in: filters.format } // validation for published year
+    if (filters.genre?.length) query.genre = { $in: filters.genre } // validation for published year
+    if (filters.keywords?.length) query.keywords = { $in: filters.keywords } // validation for published year
     if (filters.newRelease) {
       query.newRelease = filters.newRelease // filtering for new releases
     }
-    if (filters.keywords) {
-      query.keywords = filters.keywords // filtering for keywords
-    }
-
     if (filters.yearTo || filters.yearFrom) { // i removed 0,4 so that my full date works instead of just year
       const dateQuery = {}
 
@@ -106,6 +100,7 @@ class DBObject {
         query.publishedDate = dateQuery
       }
     }
+
     const [sortField, sortOrder] = sort.split(' ')
     const sortQuery = { [sortField]: sortOrder.toLowerCase() === 'asc' ? 1 : -1 }
     const skip = (page - 1) * pageSize

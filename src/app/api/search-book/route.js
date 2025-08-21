@@ -5,13 +5,7 @@ export async function POST (request) {
   try {
     const requestData = await request.json()
     const { searchTerm, filters, sort, page, pageSize } = requestData
-    console.log('API received search request:', {
-      searchTerm,
-      filters,
-      sort,
-      page,
-      pageSize
-    })
+
     // validate searchTerm
     const cleanSearchTerm = typeof searchTerm === 'string' ? searchTerm : ''
     // Create a new DBObject for books collection

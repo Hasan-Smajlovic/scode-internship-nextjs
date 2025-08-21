@@ -8,23 +8,25 @@ import Sort from './Sort'
 import Items from './Items'
 import Pagging from './Pagging'
 
-export default function SearchBooks ({
-  items: initialItems,
-  totalCount: initialTotalCount,
-  facets: initialFacets,
-  alwaysShow = false,
-  initialSearchParams = {}
-}) {
+export default function SearchBooks (props) {
+  const {
+    items: initialItems,
+    totalCount: initialTotalCount,
+    facets: initialFacets,
+    alwaysShow = false,
+    initialSearchParams = {},
+    isContentPage = false
+  } = props
+
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const isFirstRender = useRef(true)
-  const [hasSetInitialParams, setHasSetInitialParams] = useState(false)
 
-  // Extract initial filters and sort from initialSearchParams
+  // extracting initial filters and sort from initialSearchParams
   const initialFilters = initialSearchParams.filters || {}
   const initialSort = initialSearchParams.sort || 'title ASC'
 
-  // Use initialSearchParams for default values if present
+  // initialSearchParams for default values if present
   const format = searchParams.get('format') || initialFilters.format || ''
   const genre = searchParams.get('genre') || initialFilters.genre || ''
   const newRelease = searchParams.get('newRelease') ?? initialFilters.newRelease ?? ''
@@ -39,36 +41,13 @@ export default function SearchBooks ({
   const itemsPerPage = parseInt(searchParams.get('pageSize') || '10', 10)
   const sort = searchParams.get('sort') || initialSort
 
-  // Make sure initialItems is an array to avoid errors
-  const safeInitialItems = Array.isArray(initialItems) ? initialItems : []
-
   // States for items, totalCount, facets
-  const [items, setItems] = useState(safeInitialItems)
+  const [items, setItems] = useState(initialItems)
   const [totalCount, setTotalCount] = useState(initialTotalCount || 0)
   const [facets, setFacets] = useState(initialFacets || {})
-  const [filteredItems, setFilteredItems] = useState(safeInitialItems)
+  const [filteredItems, setFilteredItems] = useState(initialItems)
 
   const totalPages = Math.ceil(totalCount / itemsPerPage)
-
-  // Set initial search params in URL on first mount
-  useEffect(() => {
-    if (!hasSetInitialParams && initialSearchParams && Object.keys(initialFilters).length > 0) {
-      const params = new URLSearchParams(Array.from(searchParams.entries()))
-      Object.entries(initialFilters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '' && value !== null && !(Array.isArray(value) && value.length === 0)) {
-          params.set(key, value)
-        } else {
-          params.delete(key)
-        }
-      })
-      if (initialSort) {
-        params.set('sort', initialSort)
-      }
-      window.history.replaceState({}, '', `${pathname}?${params.toString()}`)
-      setHasSetInitialParams(true)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialSearchParams, pathname, searchParams, hasSetInitialParams])
 
   const updateFilters = (newParams) => {
     const params = new URLSearchParams(Array.from(searchParams.entries()))
@@ -121,12 +100,12 @@ export default function SearchBooks ({
         body    : JSON.stringify({
           searchTerm,
           filters: {
-            format,
-            genre,
+            format        : format ? [format] : [],
+            genre         : genre ? [genre] : [],
             pageCount,
-            newRelease: newRelease === 'true',
-            publishedYear,
-            keywords,
+            newRelease    : newRelease === 'true',
+            publishedYear : publishedYear ? [publishedYear] : [],
+            keywords      : keywords ? [keywords] : [],
             yearFrom,
             yearTo
           },
@@ -171,6 +150,15 @@ export default function SearchBooks ({
   ])
 
   useEffect(() => {
+    // main body
+    // cleanup
+    return () => {
+      isFirstRender.current = true
+    }
+  }, [])
+
+  console.log({ out: isFirstRender.current })
+  useEffect(() => {
     setFilteredItems(items)
   }, [items])
 
@@ -197,9 +185,9 @@ export default function SearchBooks ({
         <div className='w-full h-full p-4 flex flex-col gap-4 bg-white rounded-lg border-r border-b border-gray-200'>
           <Filter
             facets={{
-              formats  : facets.format || [],
-              genres   : facets.genre || [],
-              years    : facets.year || [],
+              formats  : facets.formats || [],
+              genres   : facets.genres || [],
+              years    : facets.years || [],
               keywords : facets.keywords || []
             }}
             format={format}
@@ -208,12 +196,15 @@ export default function SearchBooks ({
             keywords={keywords}
             yearFrom={yearFrom}
             yearTo={yearTo}
+            newRelease={newRelease}
             updateFilters={updateFilters}
+            initialFilters={initialFilters}
+            isContentPage={isContentPage}
           />
         </div>
       </aside>
       <main className='w-full md:w-2/3 lg:w-3/4 flex flex-col gap-4'>
-        <div className='flex flex-col gap-4 mb-4 justify-center md:flex-row md:items-center md:justify-between'>
+        <div className='flex flex-col gap-4 mb-4 justify-center md:flex-row md:items-center md:justify-between border-b border-gray-200 pb-4'>
           <Sort
             value={searchParams.get('sort') || 'title ASC'}
             onChange={handleSortChange}
@@ -249,5 +240,6 @@ SearchBooks.propTypes = {
   initialSearchParams : PropTypes.shape({
     filters : PropTypes.object,
     sort    : PropTypes.string
-  })
+  }),
+  isContentPage: PropTypes.bool
 }

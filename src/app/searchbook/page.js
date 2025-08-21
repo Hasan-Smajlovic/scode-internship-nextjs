@@ -27,10 +27,10 @@ const getItemsBySearchQuery = async (searchParams) => {
     sort
   }
 
-  if (format) searchObject.filters.format = format
-  if (genre) searchObject.filters.genre = genre
-  if (publishedYear) searchObject.filters.publishedYear = publishedYear
-  if (keywords) searchObject.filters.keywords = keywords
+  if (format) searchObject.filters.format = [format]
+  if (genre) searchObject.filters.genre = [genre]
+  if (publishedYear) searchObject.filters.publishedYear = [publishedYear]
+  if (keywords) searchObject.filters.keywords = [keywords]
   if (yearFrom) searchObject.filters.yearFrom = yearFrom
   if (yearTo) searchObject.filters.yearTo = yearTo
   if (newRelease) searchObject.filters.newRelease = newRelease === 'true'
@@ -52,8 +52,6 @@ export default async function SearchBooks (props) {
     const currentPage = params.page || '1'
     return (
       <main className='bg-white min-h-screen'>
-        <h1 className='text-2xl font-bold mb-4'>Search Results</h1>
-        <p className='text-gray-600 mb-4'>Showing results for: {params.query}</p>
         <SearchBook
           items={response.items || []}
           totalCount={response.totalCount || 0}

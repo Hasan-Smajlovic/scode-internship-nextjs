@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 import DBObject from '@/data/mongoDb/DBObject'
 import AddedContent from '@/components/templates/addedContent/index'
+
 // content items
-async function getContentWithSearchResults (id) {
+async function getContentFromDB (id) {
   try {
     const dbObject = new DBObject('content')
     await dbObject.init()
@@ -17,61 +18,22 @@ async function getContentWithSearchResults (id) {
     await booksDb.init()
 
     // extract filters from the nested searchRequest object
-    const filtersObj = content.searchRequest?.filters || {}
-    const sort = content.searchRequest?.sort || 'title ASC'
-
-    // always array
-    const normalize = (val) => !val ? [] : Array.isArray(val) ? val : [val]
-
-    const processedFilters = {}
-
-    if (filtersObj.format) {
-      processedFilters.format = { $in: normalize(filtersObj.format) }
-    }
-
-    if (filtersObj.genre?.length) {
-      processedFilters.genre = { $in: filtersObj.genre }
-    }
-
-    if (filtersObj.keywords?.length) {
-      processedFilters.keywords = { $in: filtersObj.keywords }
-    }
-
-    if (filtersObj.year) {
-      processedFilters.publishedDate = { $regex: `^${filtersObj.year[0] || filtersObj.year}` }
-    }
-
-    if (filtersObj.newRelease !== undefined) {
-      processedFilters.newRelease = filtersObj.newRelease
-    }
     const searchParams = {
       searchTerm : '',
-      filters    : processedFilters,
-      sort,
+      filters    : content.searchRequest?.filters || {},
+      sort       : content.searchRequest?.sort || 'title ASC',
       page       : 1,
       pageSize   : 10
     }
 
-    console.log('Filters received:', filtersObj)
-
     try {
       const searchResults = await booksDb.searchWithFacets(searchParams)
-      console.log('Search results items without length:', searchResults)
-
-      if (!searchResults.facets) {
-        searchResults.facets = {}
-      }
-      searchResults.facets.format = searchResults.facets.format || []
-      searchResults.facets.genre = searchResults.facets.genre || []
-      searchResults.facets.keywords = searchResults.facets.keywords || []
-      searchResults.facets.year = searchResults.facets.year || []
 
       return {
         content,
         searchResults,
-        initialSearchParams: { // iskoristi ove u searchbook da excluda vec predefinisan filter i isto tako da mi vraca tacnu vrijednost
-          filters: filtersObj,
-          sort
+        initialSearchParams: {
+          ...content.searchRequest
         }
       }
     } catch (searchError) {
@@ -89,8 +51,7 @@ async function getContentWithSearchResults (id) {
           }
         },
         initialSearchParams: {
-          filters: filtersObj,
-          sort
+          ...content.searchRequest
         }
       }
     }
@@ -106,24 +67,30 @@ export default async function ContentPage ({ params }) {
 
   if (!id) {
     return (
-      <main className='bg-white min-h-screen p-4'>
-        <div className='max-w-7xl mx-auto'>
-          <div className='mb-6 p-6 bg-white shadow-lg rounded-lg'>
-            <h1 className='text-3xl font-bold mb-4'>Invalid ID parameter</h1>
+      <main className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='bg-white rounded-2xl shadow-lg p-8 border border-slate-100'>
+            <div className='text-center py-8'>
+              <h1 className='text-3xl font-bold text-slate-800 mb-4'>Invalid ID parameter</h1>
+              <p className='text-slate-600'>The requested content could not be found. Please check the URL and try again.</p>
+            </div>
           </div>
         </div>
       </main>
     )
   }
 
-  const data = await getContentWithSearchResults(id)
+  const data = await getContentFromDB(id)
 
   if (!data) {
     return (
-      <main className='bg-white min-h-screen p-4'>
-        <div className='max-w-7xl mx-auto'>
-          <div className='mb-6 p-6 bg-white shadow-lg rounded-lg'>
-            <h1 className='text-3xl font-bold mb-4'>Content not found</h1>
+      <main className='min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4'>
+        <div className='max-w-4xl mx-auto'>
+          <div className='bg-white rounded-2xl shadow-lg p-8 border border-slate-100'>
+            <div className='text-center py-8'>
+              <h1 className='text-3xl font-bold text-slate-800 mb-4'>Content not found</h1>
+              <p className='text-slate-600'>The requested content does not exist or may have been removed.</p>
+            </div>
           </div>
         </div>
       </main>
@@ -131,22 +98,27 @@ export default async function ContentPage ({ params }) {
   }
 
   const { content, initialSearchParams } = data
-  console.log('Content fetched:', content)
-  console.log('Initial search params:', initialSearchParams)
 
   return (
-    <main className='bg-white min-h-screen p-4'>
+    <main className='min-h-screen bg-gradient-to-br from-slate-10 to-white-10 py-8 px-4'>
       <div className='max-w-7xl mx-auto'>
-        <div className='mb-6 p-6 bg-white shadow-lg rounded-lg'>
-          <h1 className='text-3xl font-bold mb-4'>{content.title}</h1>
+        <div className='mb-10 text-center px-4 py-12 bg-gradient-to-r from-white-600 to-indigo-100 rounded-2xl shadow-xl text-primary'>
+          <h1 className='text-4xl md:text-5xl font-bold mb-4 font-serif tracking-tight'>
+            {content.title}
+          </h1>
           {content.description && (
-            <p className='text-gray-700'>{content.description}</p>
+            <p className='text-xl text-black max-w-3xl mx-auto leading-relaxed'>
+              {content.description}
+            </p>
           )}
         </div>
-        <AddedContent
-          searchResults={data.searchResults}
-          initialSearchParams={initialSearchParams}
-        />
+
+        <div className='bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200'>
+          <AddedContent
+            searchResults={data.searchResults}
+            initialSearchParams={initialSearchParams}
+          />
+        </div>
       </div>
     </main>
   )
