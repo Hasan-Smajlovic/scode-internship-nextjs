@@ -1,5 +1,6 @@
-import { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { useRef, useState, useEffect } from 'react'
+
 import Label from '../atoms/Label'
 import Button from '../atoms/Button'
 

@@ -1,6 +1,6 @@
 'use client'
-
 import PropTypes from 'prop-types'
+
 import SearchBooks from '@/components/templates/SearchBooks/index'
 
 export default function AddedContentPage ({ searchResults, initialSearchParams, alwaysShow = true }) {

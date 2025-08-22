@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+
 import DBObject from '@/data/mongoDb/DBObject'
 import { CONTENT_COLLECTION } from '@/constants/collections'
 
@@ -39,8 +40,6 @@ export async function POST (request) {
         { status: 500 }
       )
     }
-
-    console.log('Content submission received:', result)
 
     return NextResponse.json({
       success : true,

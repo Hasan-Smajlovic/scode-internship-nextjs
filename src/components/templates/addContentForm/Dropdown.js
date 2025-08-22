@@ -1,5 +1,7 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { FiChevronDown } from 'react-icons/fi'
+
 import Link from 'next/link'
 
 export default function Dropdown () {
@@ -8,12 +10,9 @@ export default function Dropdown () {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen)
-  }
-
-  useEffect(() => {
-    const fetchContent = async () => {
+  const toggleDropdown = async () => {
+    // Only fetch if opening and not already loaded
+    if (!isOpen && contentItems.length === 0 && !isLoading) {
       setIsLoading(true)
       setError(null)
       try {
@@ -44,10 +43,8 @@ export default function Dropdown () {
         setIsLoading(false)
       }
     }
-
-    fetchContent()
-  }, [])
-
+    setIsOpen(!isOpen)
+  }
   const handleSelectItem = (item) => {
     setIsOpen(false)
   }
@@ -57,21 +54,22 @@ export default function Dropdown () {
       <div>
         <button
           type='button'
-          className='inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500'
+          className='flex items-center py-2 px-3 rounded-md hover:bg-slate-700/50 transition-all duration-300 group'
           id='options-menu'
           aria-haspopup='true'
           aria-expanded='true'
           onClick={toggleDropdown}
         >
           Select Content
+          <FiChevronDown />
         </button>
       </div>
 
       {isOpen && (
         <div className='absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5'>
-          <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+          <div role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
             {isLoading && (
-              <div className='px-4 py-2 text-sm text-gray-500'>Loading...</div>
+              <div className='px-4 py-2 text-sm text-white bg-gradient-to-r from-slate-900 to-slate-800'>Loading...</div>
             )}
 
             {error && (
@@ -79,7 +77,7 @@ export default function Dropdown () {
             )}
 
             {!isLoading && !error && contentItems.length === 0 && (
-              <div className='px-4 py-2 text-sm text-gray-500'>No content available</div>
+              <div className='px-4 py-2 text-sm text-white bg-gradient-to-r from-slate-900 to-slate-800'>No content available</div>
             )}
 
             {!isLoading && !error && contentItems.map((item) => (
@@ -87,7 +85,7 @@ export default function Dropdown () {
                 key={item.id}
                 href={`/content/${item.id}`}
                 onClick={() => handleSelectItem(item)}
-                className='block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                className='block px-4 py-2 text-sm bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-600 hover:to-slate-600 transition'
               >
                 {item.title}
               </Link>

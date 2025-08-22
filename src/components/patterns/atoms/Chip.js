@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MdClose } from 'react-icons/md'
+
 import Icon from '../atoms/Icon'
 
 function Chip ({

@@ -80,14 +80,14 @@ class DBObject {
       query.publishedDate = {
         $in: filters.publishedYear.map(y => new RegExp(`^${y}`))
       }
-    } // validation for published year
-    if (filters.format?.length) query.format = { $in: filters.format } // validation for published year
-    if (filters.genre?.length) query.genre = { $in: filters.genre } // validation for published year
-    if (filters.keywords?.length) query.keywords = { $in: filters.keywords } // validation for published year
-    if (filters.newRelease) {
-      query.newRelease = filters.newRelease // filtering for new releases
     }
-    if (filters.yearTo || filters.yearFrom) { // i removed 0,4 so that my full date works instead of just year
+    if (filters.format?.length) query.format = { $in: filters.format }
+    if (filters.genre?.length) query.genre = { $in: filters.genre }
+    if (filters.keywords?.length) query.keywords = { $in: filters.keywords }
+    if (filters.newRelease) {
+      query.newRelease = filters.newRelease
+    }
+    if (filters.yearTo || filters.yearFrom) {
       const dateQuery = {}
 
       if (filters.yearFrom && filters.yearFrom.trim() !== '') {
@@ -267,8 +267,15 @@ class DBObject {
 
   async getById (id) {
     try {
-      const objectId = new ObjectId(id)
-      return await this.collection.findOne({ _id: objectId })
+      const objectId = new ObjectId(String(id))
+
+      let data = await this.collection.findOne({ _id: objectId })
+      data = {
+        id: data._id.toString(),
+        ...data
+      }
+      delete data._id
+      return data
     } catch (error) {
       console.error('Error fetching document by ID:', error)
       return null

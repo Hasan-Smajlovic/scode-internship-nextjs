@@ -1,5 +1,6 @@
-import { FaUser, FaTimes, FaPlus } from 'react-icons/fa'
 import PropTypes from 'prop-types'
+import { FaUser, FaTimes, FaPlus } from 'react-icons/fa'
+
 import InputLabel from '@/components/patterns/molecules/InputLabel'
 import UploadInput from '@/components/patterns/molecules/UploadInput'
 import Alert from '../atoms/Alert'

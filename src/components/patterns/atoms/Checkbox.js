@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+
 import Input from './Input'
 
 export default function Checkbox ({ label, checked, onChange, className = '', ...rest }) {

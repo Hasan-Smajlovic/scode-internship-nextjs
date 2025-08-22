@@ -1,6 +1,6 @@
 'use client'
-
 import PropTypes from 'prop-types'
+
 import Input from '../atoms/Input'
 import Label from '../atoms/Label'
 import Icon from '../atoms/Icon'

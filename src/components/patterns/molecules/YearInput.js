@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+
 import Label from '@/components/patterns/atoms/Label'
 
 export default function YearInput ({ minYear, maxYear, yearFrom, yearTo, onChange }) {

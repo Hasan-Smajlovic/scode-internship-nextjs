@@ -153,7 +153,13 @@ export default function AddContentForm () {
     <div className='w-full px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10'>
       <form className='w-full max-w-6xl mx-auto' onSubmit={handleSubmit}>
         <div className='w-full mx-auto p-4 sm:p-6 md:p-8 bg-white shadow-lg rounded-lg'>
+          <div className='mb-8 text-center'>
+            <h2 className='text-3xl font-bold text-slate-800 mb-2'>Add New Content</h2>
+            <p className='text-slate-600'>Fill out the form below to add your personalized page</p>
+          </div>
+
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6'>
+
             <div>
               <InputLabel
                 id='title'

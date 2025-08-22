@@ -150,14 +150,12 @@ export default function SearchBooks (props) {
   ])
 
   useEffect(() => {
-    // main body
-    // cleanup
+    // Cleanup only after first render dependencies
     return () => {
       isFirstRender.current = true
     }
   }, [])
 
-  console.log({ out: isFirstRender.current })
   useEffect(() => {
     setFilteredItems(items)
   }, [items])

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+
 import DBObject from '@/data/mongoDb/DBObject'
 import AddedContent from '@/components/templates/addedContent/index'
 

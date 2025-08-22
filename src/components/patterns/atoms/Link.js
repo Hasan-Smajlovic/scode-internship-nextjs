@@ -1,7 +1,7 @@
 import NextLink from 'next/link'
 import PropTypes from 'prop-types'
 
-export default function Link ({ href, children, ...props }) {
+export default function Link ({ href, children, className, ...props }) {
   if (!href) {
     throw new Error('The \'href\' prop is required for Link component.')
   }
@@ -11,7 +11,7 @@ export default function Link ({ href, children, ...props }) {
       <NextLink
         href={href}
         {...props}
-        className='text-info hover:text-blue-500 hover:underline transition-colors ml-5'
+        className={className}
       >
         {children}
       </NextLink>
@@ -20,6 +20,7 @@ export default function Link ({ href, children, ...props }) {
 }
 
 Link.propTypes = {
-  href     : PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-  children : PropTypes.node.isRequired
+  href      : PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+  children  : PropTypes.node.isRequired,
+  className : PropTypes.string
 }

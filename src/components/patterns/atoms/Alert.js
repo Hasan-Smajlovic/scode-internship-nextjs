@@ -1,10 +1,10 @@
 'use client'
-
 import PropTypes from 'prop-types'
 import { useState, useEffect, useCallback } from 'react'
 import { createRoot } from 'react-dom/client'
-import Icon from './Icon'
 import { MdClose } from 'react-icons/md'
+
+import Icon from './Icon'
 
 export default function Alert ({ type = 'info', children, timeout = 5000, position = 'bottom-center', onClose }) {
   const [isVisible, setIsVisible] = useState(true)

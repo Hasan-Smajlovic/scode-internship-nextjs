@@ -26,6 +26,10 @@
   --color-danger-dark: #7F1D1D;
 }
 
+body {
+  background: linear-gradient(to bottom right, #eeeeee, #ffffff);
+}
+
 .bg-primary {
   background-color: var(--color-primary);
 }
